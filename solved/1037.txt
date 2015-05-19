@@ -1,0 +1,42 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100001
+
+int main(void){
+    int nc, np;
+    int coupon[MMAXLEN], product[MMAXLEN];
+    scanf("%d", &nc);
+    for(int i = 0; i < nc; i++)
+        scanf("%d", &coupon[i]);
+    scanf("%d", &np);
+    for(int i = 0; i < np; i++)
+        scanf("%d", &product[i]);
+
+    sort(coupon, coupon + nc);
+    sort(product, product + np);
+#ifdef MDEBUG
+    for(int i = 0; i < nc; i++){
+        printf("%d ", coupon[i]);
+    }
+#endif // MDEBUG
+    long long money = 0;
+    for(int i = 0; (coupon[i] ^ product[i]) >> 31 == 0 && i < nc && i < np && coupon[i] >> 31 == -1; i++){
+        money += coupon[i] * product[i];
+    }
+    for(int i = 1; (coupon[nc - i] ^ product[np - i]) >> 31 == 0 && i <= nc && i <= np && coupon[nc - i] >> 31 == 0; i++){
+        money += coupon[nc - i] * product[np - i];
+    }
+    printf("%d", money);
+    return 0;
+}

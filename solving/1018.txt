@@ -1,0 +1,166 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <vector>
+#include <list>
+#include <string>
+#include <algorithm>
+#define INT_MAX 0x7fffffff
+using namespace std;
+int c_max, n, node_p, m, g_shortest_length;
+vector<int> path, final_path;
+int min_to_send = INT_MAX, min_to_take = INT_MAX;
+
+struct g_node_list_node{
+    int length;
+    int next_node;
+};
+
+struct g_node{
+    int pos;
+    bool has_checked = false;
+    bool has_shortest = false;
+    int shortest_length = INT_MAX;
+    int bike_num;
+    list<g_node_list_node> next_node_list;
+};
+
+g_node g[501];
+
+void set_g_bool(bool b){
+    for(int i = 1; i <= n; i++){
+        g[i].has_checked = b;
+        g[i].has_shortest = b;
+    }
+}
+
+bool shortest_path_length_end(void){
+    for(int i = 0; i <= n; i++){
+        if(g[i].has_shortest == false)
+            return false;
+    }
+    return true;
+}
+
+int get_shortest_path_length(void){
+    int last_node_pos = 0;
+    while(!shortest_path_length_end()){
+        for(auto i = g[last_node_pos].next_node_list.begin(); i != g[last_node_pos].next_node_list.end(); i++){
+                //对边松弛
+            int next_node_pos = (*i).next_node;
+            if(g[last_node_pos].shortest_length + (*i).length < g[next_node_pos].shortest_length)
+                g[next_node_pos].shortest_length = g[last_node_pos].shortest_length + (*i).length;
+        }
+        int shortest_node_pos = 1, shortest_path_t = INT_MAX;
+        for(int i = 1; i <= n; i++){
+            //找到最短边
+            if(g[i].has_shortest == false && g[i].shortest_length < shortest_path_t){
+                shortest_path_t = g[i].shortest_length;
+                shortest_node_pos = i;
+            }
+        }
+
+        g[shortest_node_pos].has_shortest = true;
+        last_node_pos = shortest_node_pos;
+    }
+
+    return g[node_p].shortest_length;
+}
+
+void deep(int node_pos){
+    if(node_pos == node_p){
+        if(g[node_p].bike_num == c_max){
+            //问题点车满
+            min_to_send = 0;
+            int bike_to_take = 0;
+            for(auto i = path.begin(); (i + 1) != path.end(); i++){
+                bike_to_take += (c_max / 2 - g[(*i)].bike_num);
+            }
+            bike_to_take = c_max / 2 - bike_to_take;
+            if(min_to_take > 0){
+                if(bike_to_take < min_to_take){
+                    min_to_take = bike_to_take;
+                    final_path = path;
+                }
+            }else{
+                if(bike_to_take < 0 && bike_to_take > min_to_take){
+                    min_to_take = bike_to_take;
+                    final_path = path;
+                }
+            }
+        }else{
+            //问题点空
+            min_to_take = 0;
+            int bike_to_send = 0;
+            for(auto i = path.begin(); (i + 1) != path.end(); i++){
+                bike_to_send += (g[(*i)].bike_num - c_max / 2);
+            }
+            bike_to_send = c_max / 2 - bike_to_send;
+            if(min_to_send > 0){
+                if(bike_to_send < min_to_send){
+                    min_to_send = bike_to_send;
+                    final_path = path;
+                }
+            }else{
+                if(bike_to_send < 0 && bike_to_send > min_to_send){
+                    min_to_send = bike_to_send;
+                    final_path = path;
+                }
+            }
+        }
+        return ;
+    }
+
+    for(auto i = g[node_pos].next_node_list.begin(); i != g[node_pos].next_node_list.end(); i++){
+        int next_node_pos = (*i).next_node;
+        if(g[next_node_pos].shortest_length - g[node_pos].shortest_length == (*i).length){
+            path.push_back(next_node_pos);
+            deep(next_node_pos);
+            path.pop_back();
+        }
+    }
+}
+
+int main(void){
+    scanf("%d%d%d%d", &c_max, &n, &node_p, &m);
+    for(int i = 1; i <= n; i++){
+        scanf("%d", &(g[i].bike_num));
+        g[i].pos = i;
+    }
+
+    for(int i = 0; i < m; i++){
+        int a, b, l;
+        cin>>a>>b>>l;
+        g_node_list_node t;
+        t.length = l;
+        t.next_node = b;
+        g[a].next_node_list.push_back(t);
+        t.next_node = a;
+        g[b].next_node_list.push_back(t);
+    }
+
+    g[0].has_shortest = true;
+    g[0].shortest_length = 0;
+    g_shortest_length = get_shortest_path_length();
+
+    deep(0);
+
+    if(min_to_send < 0){
+        cout<<"0 0";
+        for(auto i = final_path.begin(); i != final_path.end(); i++)
+            cout<<"->"<<(*i);
+        cout<<' '<<-min_to_send;
+    }else if(min_to_take < 0){
+        cout<<-min_to_take<<" 0";
+        for(auto i = final_path.begin(); i != final_path.end(); i++)
+            cout<<"->"<<(*i);
+        cout<<" 0";
+    }else{
+        cout<<min_to_send<<" 0";
+        for(auto i = final_path.begin(); i != final_path.end(); i++)
+            cout<<"->"<<(*i);
+        cout<<' '<<min_to_take;
+    }
+
+    return 0;
+}

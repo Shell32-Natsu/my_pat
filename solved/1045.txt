@@ -1,0 +1,44 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 10001
+
+int fav[200];
+int stripe[MMAXLEN];
+int ret[MMAXLEN];
+
+int main(void){
+    int n, m, l;
+    scanf("%d%d", &n, &m);
+    for(int i = 0 ; i < m; i++)
+        scanf("%d", &fav[i]);
+    scanf("%d", &l);
+    for(int i = 0 ; i < l; i++)
+        scanf("%d", &stripe[i]);
+
+    int fav_p = 0, stripe_p, ret_p = 0;
+    for(stripe_p = 0; stripe_p < l; stripe_p++){
+        if(stripe[stripe_p] == fav[fav_p]){
+            ret[ret_p++] = stripe[stripe_p];
+        }
+        if(fav_p + 1 < m && stripe[stripe_p] == fav[fav_p + 1]){
+            ret[ret_p++] = stripe[stripe_p];
+            fav_p++;
+        }
+    }
+
+    printf("%d", ret_p);
+
+    return 0;
+}

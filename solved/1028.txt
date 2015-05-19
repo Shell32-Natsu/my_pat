@@ -1,0 +1,99 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+using namespace std;
+
+struct item{
+    string name;
+    int score, id;
+};
+struct cmp1{
+    bool operator ()(item a, item b){return a.id > b.id;}
+};
+struct cmp2{
+    bool operator ()(item a, item b){
+        if(a.name == b.name)
+            return a.id > b.id;
+        return a.name > b.name;
+    }
+};
+struct cmp3{
+    bool operator ()(item a, item b){
+        if(a.score == b.score)
+            return a.id > b.id;
+        return a.score > b.score;
+    }
+};
+
+int main(void){
+    int n ,c;
+    cin>>n>>c;
+    /*for(int i = 0; i < n; i++){
+        cin>>arr[i].id>>arr[i].name;
+        scanf("%d", &arr[i].score);
+    }*/
+
+    /*for(auto i = 0; i < n; i++){
+        printf("%s %s %d\n", arr[i].id.c_str(), arr[i].name.c_str(), arr[i].score);
+    }*/
+    if(c == 1){
+        priority_queue<item, vector<item>, cmp1> arr_t;
+        for(int i = 0; i < n; i++){
+            item t;
+            scanf("%d", &t.id);
+            cin>>t.name;
+            scanf("%d", &t.score);
+            arr_t.push(t);
+        }
+        while(!arr_t.empty()){
+            item t = arr_t.top();
+            printf("%06d %s %d\n", t.id, t.name.c_str(), t.score);
+            arr_t.pop();
+        }
+    }
+    else if(c == 2){
+
+        priority_queue<item, vector<item>, cmp2> arr_tt;
+        for(int i = 0; i < n; i++){
+            item t;
+            scanf("%d", &t.id);
+            cin>>t.name;
+            scanf("%d", &t.score);
+            arr_tt.push(t);
+        }
+        while(!arr_tt.empty()){
+            item t = arr_tt.top();
+            printf("%06d %s %d\n", t.id, t.name.c_str(), t.score);
+            arr_tt.pop();
+        }
+    }
+    else{
+        priority_queue<item, vector<item>, cmp3> arr_ttt;
+        for(int i = 0; i < n; i++){
+            item t;
+            scanf("%d", &t.id);
+            cin>>t.name;
+            scanf("%d", &t.score);
+            arr_ttt.push(t);
+        }
+        while(!arr_ttt.empty()){
+            item t = arr_ttt.top();
+            printf("%06d %s %d\n", t.id, t.name.c_str(), t.score);
+            arr_ttt.pop();
+        }
+    }
+
+
+    /*for(auto i = 0; i < n; i++){
+        printf("%s %s %d\n", arr[i].id.c_str(), arr[i].name.c_str(), arr[i].score);
+    }*/
+
+    return 0;
+}

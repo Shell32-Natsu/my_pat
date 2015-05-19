@@ -1,0 +1,109 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+using namespace std;
+
+int start_node, end_node, n, m;
+
+struct g_node_list_node{
+    int next_node, length, cost;
+};
+struct g_node{
+    int length;
+    int shortest_length = INT_MAX;
+    bool has_shortest = false, is_checked = false;;
+    vector<g_node_list_node> next_list;
+};
+
+g_node g[500];
+
+int get_shortest(void){
+    int shortest_length = INT_MAX, pos = 0;
+    for(int i = 0; i < n; i++){
+        if( g[i].has_shortest == false ){
+            if( g[i].shortest_length < shortest_length ){
+                shortest_length = g[i].shortest_length;
+                pos = i;
+            }
+        }
+    }
+    return pos;
+}
+
+void dijkstra(void){
+    int shortest_count = 1;
+    while(shortest_count < n){
+        int shortest_node = get_shortest();
+        for(auto i = g[shortest_node].next_list.begin(); i != g[shortest_node].next_list.end(); i++){
+            if( g[ (*i).next_node ].shortest_length > g[shortest_node].shortest_length + (*i).length ){
+                g[ (*i).next_node ].shortest_length = g[shortest_node].shortest_length + (*i).length;
+            }
+        }
+        g[shortest_node].has_shortest = true;
+        shortest_count++;
+    }
+}
+
+vector<int> path_cost;
+int min_cost = INT_MAX;
+
+void find_path(int node, vector<int> &v, vector<int> &ret){
+    if(node == end_node){
+        int sum = 0;
+        for(auto i : path_cost){
+            sum += i;
+        }
+        if(sum < min_cost){
+            min_cost = sum;
+            ret = v;
+            ret.push_back(node);
+        }
+        return;
+    }
+    g[node].is_checked = true;
+    v.push_back(node);
+    for(auto i = g[node].next_list.begin(); i != g[node].next_list.end(); i++){
+        if(g[(*i).next_node].is_checked == true)
+            continue;
+        if(g[(*i).next_node].shortest_length - g[node].shortest_length != (*i).length)
+            continue;
+        path_cost.push_back((*i).cost);
+        find_path((*i).next_node, v, ret);
+        path_cost.pop_back();
+    }
+    v.pop_back();
+}
+
+int main(void){
+    scanf("%d%d%d%d", &n, &m, &start_node, &end_node);
+    for(int i = 0; i < m; i++){
+        int a, b, l, c;
+        scanf("%d%d%d%d", &a, &b, &l, &c);
+        g_node_list_node t;
+        t.cost = c, t.length = l, t.next_node = b;
+        g[a].next_list.push_back(t);
+        t.next_node = a;
+        g[b].next_list.push_back(t);
+    }
+    g[start_node].shortest_length = 0;
+    //g[start_node].has_shortest = true;
+    dijkstra();
+    /*for(int i = 0; i < n; i++)
+        printf("节点%d到%d节点的最短距离为:%d\n", i, start_node, g[i].shortest_length);*/
+    //minimium_g();
+    vector<int> path, ret;
+    find_path(start_node, path, ret);
+    for(auto i : ret){
+        printf("%d ", i);
+    }
+    printf("%d %d", g[end_node].shortest_length, min_cost);
+    return 0;
+}

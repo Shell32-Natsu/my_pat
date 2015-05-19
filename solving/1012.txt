@@ -1,0 +1,99 @@
+#include <cstdio>
+#include <cstring>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+struct grade{
+    string id;
+    int score, pm;
+};
+
+grade a_arr[2001], c_arr[2001], m_arr[2001], e_arr[2001];
+
+bool cmp(grade a, grade b)
+{
+    return a.score > b.score;
+}
+
+int main(void)
+{
+    int n, m;
+    cin>>n>>m;
+    for(int i = 0; i < n; i++){
+        string t;
+        cin>>t;
+        a_arr[i].id = c_arr[i].id = m_arr[i].id = e_arr[i].id = t;
+        cin>>c_arr[i].score>>m_arr[i].score>>e_arr[i].score;
+
+        a_arr[i].score = (c_arr[i].score + m_arr[i].score + e_arr[i].score) / 3;
+    }
+
+    sort(e_arr, e_arr + n, cmp);
+    sort(c_arr, c_arr + n, cmp);
+    sort(m_arr, m_arr + n, cmp);
+    sort(a_arr, a_arr + n, cmp);
+
+    for(int i = 0; i < m; i++){
+        string id;
+        int j;
+        cin>>id;
+        for(j = 0; j < n; j++){
+            if(a_arr[j].id == id)
+                break;
+        }
+
+        if(j == n)
+            cout<<"N/A"<<endl;
+        else{
+            for(j = 0; j < n; j++){
+                if(a_arr[j].id == id){
+                    int t = j;
+                    for(; j >= 0 && a_arr[j].score == a_arr[t].score; j--);
+                    a_arr[t].pm = j + 2;
+                    j = t;
+                }
+                if(c_arr[j].id == id){
+                    int t = j;
+                    for(; j >= 0 && c_arr[j].score == c_arr[t].score; j--);
+                    c_arr[t].pm = j + 2;
+                    j = t;
+                }
+                if(m_arr[j].id == id){
+                    int t = j;
+                    for(; j >= 0 && m_arr[j].score == m_arr[t].score; j--);
+                    m_arr[t].pm = j + 2;
+                    j = t;
+                }
+                if(e_arr[j].id == id){
+                    int t = j;
+                    for(; j >= 0 && e_arr[j].score == e_arr[t].score; j--);
+                    e_arr[t].pm = j + 2;
+                    j = t;
+                }
+            }
+            for(j = 0; j < n; j++){
+                if(a_arr[j].id == id){
+                    cout<<a_arr[j].pm<<' '<<'A'<<endl;
+                    break;
+                }
+                if(c_arr[j].id == id){
+                    cout<<c_arr[j].pm<<' '<<'C'<<endl;
+                    break;
+                }
+                if(m_arr[j].id == id){
+                    cout<<m_arr[j].pm<<' '<<'M'<<endl;
+                    break;
+                }
+                if(e_arr[j].id == id){
+                    cout<<e_arr[j].pm<<' '<<'E'<<endl;
+                    break;
+                }
+            }
+        }
+    }
+
+    return 0;
+}

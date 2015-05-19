@@ -1,0 +1,42 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100002
+
+int coins[MMAXLEN];
+
+int main(void){
+    int n, m;
+    scanf("%d%d", &n, &m);
+    for(int i = 0; i < n; i++){
+        int c;
+        scanf("%d", &c);
+        coins[c]++;
+    }
+    int i;
+    for(i = 1; i <= m / 2; i++){
+        if(i == m / 2 && coins[i] > 1){
+            printf("%d %d", i, m - i);
+            break;
+        }
+        if(i < m / 2 && coins[i] > 0 && coins[m - i] > 0){
+            printf("%d %d", i, m - i);
+            break;
+        }
+    }
+    if(i > m / 2)
+        printf("No Solution");
+
+    return 0;
+}

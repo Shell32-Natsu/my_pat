@@ -1,0 +1,141 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <vector>
+#include <queue>
+#include <string>
+#include <algorithm>
+using namespace std;
+int n, k;
+
+struct m_time{
+    int hour, minute, second;
+    m_time(int h = 8, int m = 0, int s = 0):
+        hour(h), minute(m), second(s){}
+};
+
+
+struct customer{
+    m_time arrive_time;
+    int process_time;
+    int wait_second = 0;
+};
+
+customer customer_arr[10000];
+m_time window[100];
+
+bool cmp_customer_arrive(customer a, customer b)
+{
+    if(a.arrive_time.hour == b.arrive_time.hour){
+        if(a.arrive_time.minute == b.arrive_time.minute){
+            return a.arrive_time.second < b.arrive_time.second;
+        }else
+            return a.arrive_time.minute < b.arrive_time.minute;
+    }else
+        return a.arrive_time.hour < b.arrive_time.hour;
+}
+
+bool cmp_time(m_time a, m_time b)
+{//if a < b return true, else return false
+    if(a.hour == b.hour){
+        if(a.minute == b.minute){
+            return a.second < b.second;
+        }else
+            return a.minute < b.minute;
+    }else
+        return a.hour < b.hour;
+}
+
+int minus_m_time(m_time a, m_time b)
+{
+    return (a.hour * 3600 + a.minute * 60 + a.second) - (b.hour * 3600 + b.minute * 60 + b.second);
+}
+
+void copy_m_time(m_time &a, m_time &b)
+{
+    a.hour = b.hour;
+    a.minute = b.minute;
+    a.second = b.second;
+}
+
+void add_m_time_int(m_time &a, int i)
+{
+    int t = a.hour * 3600 + a.minute * 60 + a.second + i;
+    a.hour = t / 3600;
+    t = t % 3600;
+    a.minute = t / 60;
+    t = t % 60;
+    a.second = t;
+}
+
+int main(void)
+{
+    cin>>n>>k;
+    for(int i = 0; i < n; i++){
+        int h, m, s, t;
+        scanf("%d:%d:%d%d", &h, &m, &s, &t);
+        if((h * 3600 + m * 60 + s) > 61200)
+            i--, n--;
+        else{
+            customer_arr[i].arrive_time.hour = h;
+            customer_arr[i].arrive_time.minute = m;
+            customer_arr[i].arrive_time.second = s;
+            customer_arr[i].process_time = t * 60;
+        }
+    }
+
+    sort(customer_arr, customer_arr + n, cmp_customer_arrive);
+
+    m_time eight_time;
+    for(int i = 0; i < n && cmp_time(customer_arr[i].arrive_time, eight_time); i++){
+        customer_arr[i].wait_second += minus_m_time(eight_time, customer_arr[i].arrive_time);
+        copy_m_time(customer_arr[i].arrive_time, eight_time);
+    }
+
+    /*printf("orig_data:\n");
+    for(int i = 0; i < n; i++)
+        printf("%02d:%02d:%02d %d wait_time=%d\n", customer_arr[i].arrive_time.hour, customer_arr[i].arrive_time.minute,
+               customer_arr[i].arrive_time.second, customer_arr[i].process_time, customer_arr[i].wait_second);*/
+
+    int i, j;
+    for(i = 0; i < k && i < n; i++){
+        add_m_time_int(customer_arr[i].arrive_time, customer_arr[i].process_time);
+        copy_m_time(window[i], customer_arr[i].arrive_time);
+    }
+
+    for(; i < n; i++){
+        int min_pos = -1;
+        m_time min_time(19, 0, 0);
+        for(j = 0; j < k; j++){
+            if(cmp_time(window[j], min_time)){
+                min_pos = j;
+                copy_m_time(min_time, window[j]);
+            }
+        }
+
+        if(cmp_time(min_time, customer_arr[i].arrive_time)){
+            add_m_time_int(customer_arr[i].arrive_time, customer_arr[i].process_time);
+            copy_m_time(window[min_pos], customer_arr[i].arrive_time);
+        }else{
+            customer_arr[i].wait_second += minus_m_time(window[min_pos], customer_arr[i].arrive_time);
+            add_m_time_int(window[min_pos], customer_arr[i].process_time);
+            //copy_m_time(window[min_pos], customer_arr[i].arrive_time);
+        }
+
+    }
+
+    /*printf("final_data:\n");
+    for(int i = 0; i < n; i++)
+        printf("%02d:%02d:%02d %d wait_time=%d\n", customer_arr[i].arrive_time.hour, customer_arr[i].arrive_time.minute,
+               customer_arr[i].arrive_time.second, customer_arr[i].process_time, customer_arr[i].wait_second);*/
+
+    double average_wait_time = 0;
+    for(i = 0; i < n ; i++)
+        average_wait_time += customer_arr[i].wait_second;
+    if(n == 0)
+        printf("0.0");
+    else
+        printf("%.1f", average_wait_time / n / 60.0);
+
+    return 0;
+}

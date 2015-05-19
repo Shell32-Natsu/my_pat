@@ -1,0 +1,56 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <vector>
+#include <list>
+#include <string>
+#include <algorithm>
+#define INT_MAX 0x7fffffff
+using namespace std;
+
+void trans(int a, int to_radix, vector<int> &ret)
+{
+    long long ta = a;
+
+    char ret_c[500];
+    int i = 0;
+    if(ta == 0){
+        ret.push_back(0);
+    }
+    while(ta > 0){
+        int mod_num = (ta % to_radix);
+        ret.push_back(mod_num);
+        ta /= to_radix;
+    }
+}
+
+
+int main(void){
+    int n, b;
+    cin>>n>>b;
+    vector<int> ret;
+    trans(n, b, ret);
+    /*for(auto i = ret.begin(); i != ret.end(); i++){
+        cout<<(*i)<<' ';
+    }*/
+    bool flag = true;
+    for(int i = 0; i < ret.size() / 2; i++){
+        int t = ret[i];
+        if(t != ret[ret.size() - 1 - i])
+            flag = false;
+        ret[i] = ret[ret.size() - 1 - i];
+        ret[ret.size() - 1 - i] = t;
+    }
+    printf("%s\n", flag ? "Yes" : "No");
+    char s_ret[100] = "";
+    for(auto i = ret.begin(); i != ret.end(); i++){
+        char t[100];
+        sprintf(t, "%d ", *i);
+        strcat(s_ret, t);
+    }
+    s_ret[strlen(s_ret) - 1] = 0;
+    cout<<s_ret;
+
+
+    return 0;
+}

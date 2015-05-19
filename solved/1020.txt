@@ -1,0 +1,52 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <vector>
+#include <list>
+#include <string>
+#include <algorithm>
+using namespace std;
+
+int tree[5000], postorder[30], inorder[30], level = 0;
+
+void build_tree(int p_s, int i_s, int node_num, int parent, int child){
+    if(node_num == 0)
+        return;
+    int root = postorder[p_s + node_num - 1];
+    tree[parent * 2 + child] = root;
+    //cout<<root;
+    if(node_num == 1)
+        return;
+    int root_pos_in_inorder;
+    for(int i = i_s; i < node_num + i_s; i++){
+        if(inorder[i] == root){
+            root_pos_in_inorder = i;
+            break;
+        }
+    }
+
+    build_tree(p_s, i_s, root_pos_in_inorder - i_s, parent * 2 + child, 1);
+    build_tree(p_s + root_pos_in_inorder - i_s, root_pos_in_inorder + 1, node_num + i_s - root_pos_in_inorder - 1, parent * 2 + child, 2);
+}
+
+int main(void){
+    int n;
+    cin>>n;
+    for(int i = 0; i < 5000; i++)
+        tree[i] = -1;
+    for(int i = 0; i < n; i++)
+        cin>>postorder[i];
+    for(int i = 0; i < n; i++)
+        cin>>inorder[i];
+
+    build_tree(0, 0, n, -1, 2);
+    for(int i = 0; i < 5000; i++)
+        if(tree[i] != -1){
+            if(i == 0)
+                cout<<tree[i];
+            else
+                cout<<' '<<tree[i];
+        }
+
+    return 0;
+}

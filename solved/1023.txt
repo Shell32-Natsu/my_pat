@@ -1,0 +1,49 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <cmath>
+using namespace std;
+
+void double_str(char *in, char *out){
+    int length = strlen(in), jw = 0, j = 0;
+    for(int i = length - 1; i >= 0; i--){
+        out[j++] = ((in[i] - '0') * 2 + jw) % 10 + '0';
+        jw = ((in[i] - '0') * 2 + jw) / 10;
+    }
+    if(jw == 1)
+        out[j++] = '1';
+    out[j] = 0;
+    int out_len = strlen(out);
+    for(int i = 0; i < out_len / 2; i++){
+        char t = out[i];
+        out[i] = out[out_len - i - 1];
+        out[out_len - i - 1] = t;
+    }
+}
+
+int main(void){
+    char in_str[25], doubled_str[50], doubled_str_copy[50];
+    scanf("%s", in_str);
+    double_str(in_str, doubled_str);
+    //cout<<doubled_str;
+    strcpy(doubled_str_copy, doubled_str);
+    sort(in_str, in_str + strlen(in_str));
+    sort(doubled_str, doubled_str + strlen(doubled_str));
+    int i_l = strlen(in_str), d_l = strlen(doubled_str);
+    if(i_l != d_l){
+        cout<<"No"<<endl<<doubled_str_copy;
+    }else{
+        int i;
+        for(i = 0; i < i_l && in_str[i] == doubled_str[i]; i++);
+        if(i == i_l)
+            cout<<"Yes"<<endl<<doubled_str_copy;
+        else
+            cout<<"No"<<endl<<doubled_str_copy;
+    }
+
+    return 0;
+}

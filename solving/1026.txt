@@ -1,0 +1,155 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+using namespace std;
+
+struct pairs{
+    int arrive_time;
+    int play_time;
+    int wait_time = 0;
+    int is_vip;
+    int serve_time;
+    int served = 0;
+    int pos;
+};
+
+struct desk{
+    int is_vip = 0;
+    int end_time = 8 * 3600;
+    int count = 0;
+};
+
+pairs play_pairs[10001];
+desk desks[101];
+
+int main(void){
+    int n, k, m;
+    cin>>n;
+    for(int i = 0; i < n ; i++){
+        int h, m, s;
+        scanf("%d:%d:%d%d%d", &h, &m, &s, &(play_pairs[i + 1].play_time), &(play_pairs[i + 1].is_vip));
+        play_pairs[i + 1].arrive_time = h * 3600 + m * 60 + s;
+        play_pairs[i + 1].play_time *= 60;
+    }
+
+    sort(play_pairs + 1, play_pairs + 1 + n, [&] (pairs a, pairs b){
+        return a.arrive_time < b.arrive_time;
+    });
+
+    /*for(int i = 1; i <= n; i++){
+        cout<<(int)play_pairs[i].arrive_time / 3600
+        <<':'<<(int)(play_pairs[i].arrive_time % 3600) / 60
+        <<':'<<play_pairs[i].arrive_time % 60
+        <<' '<<play_pairs[i].play_time<<' '<<play_pairs[i].is_vip<<endl;
+    }cout<<endl;*/
+    for(int i = 1; i <= n ; i++)
+        play_pairs[i].pos = i;
+
+    cin>>k>>m;
+    for(int i = 0; i < m; i++){
+        int t;
+        cin>>t;
+        desks[t].is_vip = 1;
+    }
+
+    deque<pairs> normal_que, vip_que;
+    for(int i = 1; i <= n; i++){
+        if(play_pairs[i].arrive_time >= 21 * 3600)
+            continue;
+        normal_que.push_back(play_pairs[i]);
+    }
+
+    int cur_pos = 1;
+    for(; cur_pos <= k && !normal_que.empty(); cur_pos++){
+        auto t = normal_que.front();
+        desks[cur_pos].end_time = t.arrive_time + t.play_time;
+        play_pairs[t.pos].serve_time = t.arrive_time;
+        play_pairs[t.pos].served = 1;
+        desks[cur_pos].count++;
+        normal_que.pop_front();
+    }
+
+    while(!normal_que.empty()){
+        int min_time_pos = 1, min_time = desks[1].end_time;
+        for(int i = 1; i <= k; i++)
+            if(desks[i].end_time < min_time){
+                min_time_pos = i;
+                min_time = desks[i].end_time;
+            }
+
+        if(min_time >= 21 * 3600){
+            break;
+        }
+        if(desks[min_time_pos].is_vip == 0){
+            //2?¨º?VIP¡Á¨¤
+            auto t = normal_que.front();
+
+            play_pairs[t.pos].served = 1;
+            if(desks[min_time_pos].end_time > t.arrive_time){
+                play_pairs[t.pos].wait_time = desks[min_time_pos].end_time - t.arrive_time;
+                play_pairs[t.pos].serve_time = desks[min_time_pos].end_time;
+            }else{
+                play_pairs[t.pos].serve_time = t.arrive_time;
+            }
+            desks[min_time_pos].end_time = play_pairs[t.pos].serve_time + t.play_time;
+            desks[min_time_pos].count++;
+            normal_que.pop_front();
+        }else{
+            //VIP¡Á¨¤
+            auto i = normal_que.begin();
+            int flag = 0;
+            for(; i != normal_que.end() && (*i).arrive_time <= desks[min_time_pos].end_time; i++){
+                if((*i).is_vip == 1){
+                    play_pairs[(*i).pos].served = 1;
+                    if(desks[min_time_pos].end_time > (*i).arrive_time){
+                        play_pairs[(*i).pos].wait_time = desks[min_time_pos].end_time - (*i).arrive_time;
+                        play_pairs[(*i).pos].serve_time = desks[min_time_pos].end_time;
+                    }else
+                        play_pairs[(*i).pos].serve_time = (*i).arrive_time;
+                    desks[min_time_pos].end_time = play_pairs[(*i).pos].serve_time + (*i).play_time;
+                    desks[min_time_pos].count++;
+                    flag = 1;
+                    normal_que.erase(i);
+                    break;
+                }
+            }
+            if(flag == 0){
+                auto t = normal_que.front();
+
+                play_pairs[t.pos].served = 1;
+                if(desks[min_time_pos].end_time > t.arrive_time){
+                    play_pairs[t.pos].wait_time = desks[min_time_pos].end_time - t.arrive_time;
+                    play_pairs[t.pos].serve_time = desks[min_time_pos].end_time;
+                }else
+                    play_pairs[t.pos].serve_time = t.arrive_time;
+                desks[min_time_pos].end_time = play_pairs[t.pos].serve_time + t.play_time;
+                desks[min_time_pos].count++;
+                normal_que.pop_front();
+            }
+        }
+    }
+
+    sort(play_pairs + 1, play_pairs + 1 + n, [&] (pairs a, pairs b){
+        return a.serve_time < b.serve_time;
+    });
+
+    for(int i = 1; i <= n; i++){
+        if(play_pairs[i].served == 1){
+            printf("%02d:%02d:%02d %02d:%02d:%02d %d\n", (int)play_pairs[i].arrive_time / 3600,
+                   (int)(play_pairs[i].arrive_time % 3600) / 60, play_pairs[i].arrive_time % 60,
+                   (int)play_pairs[i].serve_time / 3600, (int)(play_pairs[i].serve_time % 3600) / 60,
+                   play_pairs[i].serve_time % 60, (int)(play_pairs[i].wait_time / 60.0 + 0.5));
+        }
+    }
+    cout<<desks[1].count;
+    for(int i = 2; i <= k; i++)
+        cout<<' '<<desks[i].count;
+
+    return 0;
+}

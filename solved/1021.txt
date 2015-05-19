@@ -1,0 +1,95 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <list>
+#include <string>
+#include <algorithm>
+#include <cmath>
+using namespace std;
+int n;
+
+struct g_node{
+    int pos;
+    int component = 0;
+    int tree_height;
+    bool has_checked = false;
+    vector<int> next_node_list;
+};
+
+g_node g[10001];
+
+bool is_leaf(int root){
+    for(auto i = g[root].next_node_list.begin(); i != g[root].next_node_list.end(); i++){
+        if( g[*i].has_checked == false )
+            return false;
+    }
+    return true;
+}
+
+int find_height(int root){
+    if( is_leaf(root) ){
+        //Ò¶½Úµã
+        return 1;
+    }
+    int deepest = 0;
+    g[root].has_checked = true;
+    for(auto i = g[root].next_node_list.begin(); i != g[root].next_node_list.end(); i++){
+        if( g[*i].has_checked == false && find_height(*i) > deepest)
+            deepest = find_height(*i);
+    }
+    g[root].has_checked = false;
+    return deepest + 1;
+}
+
+int main(void){
+    cin>>n;
+    int components = 0, component_id = 1;
+
+    for(int i = 0; i < n - 1; i++){
+        g_node t;
+        int a,b;
+        cin>>a>>b;
+        a--, b--;
+        g[a].next_node_list.push_back(b);
+        g[b].next_node_list.push_back(a);
+        if(g[a].component == 0 && g[b].component == 0){
+            g[a].component = g[b].component = component_id++;
+            components++;
+        }
+        else if(g[a].component != 0 && g[b].component != 0 && g[a].component != g[b].component){
+            int min_c = g[a].component < g[b].component ? g[a].component : g[b].component;
+            int max_c = g[a].component > g[b].component ? g[a].component : g[b].component;
+            for(int j = 0; j < n; j++){
+                if(g[j].component == max_c)
+                    g[j].component = min_c;
+            }
+            components--;
+        }
+        else if(g[a].component == 0 || g[b].component == 0){
+            int zero_pos = g[a].component == 0 ? a : b, other_pos = g[a].component == 0 ? b : a;
+            g[zero_pos].component = g[other_pos].component;
+        }
+    }
+    for(int i = 0; i < n; i++)
+        if( g[i].component == 0 )
+            components++;
+    if(components > 1){
+        cout<<"Error: "<<components<<" components";
+    }else{
+        int deeptest = 0;
+        for(int i = 0; i < n; i++){
+            g[i].tree_height = find_height(i);
+            //cout<<"node "<<i + 1<<"'s deep = "<<g[i].tree_height<<endl;
+            if( g[i].tree_height > deeptest )
+                deeptest = g[i].tree_height;
+        }
+        for(int i = 0; i < n; i++)
+            if( g[i].tree_height == deeptest )
+                cout<<i + 1<<endl;
+    }
+
+
+    return 0;
+}

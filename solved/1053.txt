@@ -1,0 +1,100 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100002
+
+struct treeNode{
+    int id, weight, parent;
+    vector<int> child;
+    int pathWeight;
+    bool isLeaf = true;
+};
+
+int n, m, s;
+treeNode tree[101];
+
+void calcPathWeight(int node){
+    if(tree[node].parent == -1)
+        tree[node].pathWeight = tree[node].weight;
+    else{
+        tree[node].pathWeight = tree[node].weight + tree[tree[node].parent].pathWeight;
+    }
+    if(tree[node].isLeaf)
+        return ;
+    else{
+        for(auto i : tree[node].child){
+            calcPathWeight(i);
+        }
+    }
+}
+
+int main(void){
+    scanf("%d%d%d", &n, &m, &s);
+    for(int i = 0; i < n; i++){
+        scanf("%d", &(tree[i].weight));
+        tree[i].id = i;
+    }
+
+    tree[0].pathWeight = tree[0].weight;
+    tree[0].parent = -1;
+    for(int i = 0; i < m; i++){
+        int id, k;
+        scanf("%d%d", &id, &k);
+        tree[id].isLeaf = false;
+        for(int j = 0; j < k; j++){
+            int cId;
+            scanf("%d", &cId);
+            //tree[cId].pathWeight = tree[id].pathWeight + tree[cId].weight;
+            tree[cId].parent = id;
+            tree[id].child.push_back(cId);
+        }
+    }
+
+    calcPathWeight(0);
+
+    vector<vector<int> > ret;
+    for(int i = 0; i < n; i++){
+        if(tree[i].isLeaf && tree[i].pathWeight == s){
+            vector<int> path;
+            int p = i;
+            while(p != -1){
+                path.push_back(tree[p].weight);
+                p = tree[p].parent;
+            }
+            for(int j = 0; j < path.size() / 2; j++){
+                int t = path[path.size() - j - 1];
+                path[path.size() - j - 1] = path[j];
+                path[j] = t;
+            }
+            ret.push_back(path);
+        }
+    }
+
+    sort(ret.begin(), ret.end(), [&](vector<int> a, vector<int> b){
+            auto ia = a.begin(), ib = b.begin();
+            for(; ia != a.end() && ib != b.end() && *ia == *ib; ia++, ib++);
+            if(ia != a.end() && ib != b.end()){
+                return *ia > *ib;
+            }
+            return false;
+        });
+
+    for(auto i : ret){
+        for(auto j = 0; j < i.size() - 1; j++){
+            printf("%d ", i[j]);
+        }
+        printf("%d\n", i[i.size() - 1]);
+    }
+    return 0;
+}

@@ -1,0 +1,54 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100002
+
+struct node{
+    int next, val, addr = -1;
+};
+
+node mlist[MMAXLEN];
+node ret[MMAXLEN];
+int header;
+
+int main(void){
+    int n;
+    scanf("%d%d", &n, &header);
+    for(int i = 0; i < n; i++){
+        int addr;
+        scanf("%d", &addr);
+        scanf("%d%d",  &(mlist[addr].val), &(mlist[addr].next));
+        mlist[addr].addr = addr;
+    }
+    if(n == 0 || header < 1 ||mlist[header].addr == -1){
+        printf("0 -1\n");
+        return 0;
+    }
+    int p = header, really_num = 0;
+    while(p != -1){
+        ret[really_num++] = mlist[p];
+        p = mlist[p].next;
+    }
+    sort(ret, ret + really_num, [&](node a, node b){
+            return a.val < b.val;
+        });
+
+    printf("%d %05d\n", really_num, ret[0].addr);
+    for(int i = 0; i < really_num - 1; i++){
+        printf("%05d %d %05d\n", ret[i].addr, ret[i].val, ret[i + 1].addr);
+    }
+    printf("%05d %d -1\n", ret[really_num - 1].addr, ret[really_num - 1].val);
+
+    return 0;
+}

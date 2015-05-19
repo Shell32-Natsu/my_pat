@@ -1,0 +1,45 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 40001
+
+int num[MMAXLEN];
+
+int main(void){
+    int n;
+    scanf("%d", &n);
+    for(int i = 0; i < n; i++){
+        int t;
+        scanf("%d", &t);
+        if(num[t] > 0)
+            num[t] = INT_MAX;
+        else
+            num[t] = i + 1;
+    }
+
+    int pos = -1, min_num = INT_MAX;
+    for(int i = 0; i < MMAXLEN; i++){
+        if(num[i] == 0)
+            continue;
+        if(num[i] < min_num){
+            pos = i;
+            min_num = num[i];
+        }
+    }
+    if(pos == -1)
+        printf("None");
+    else
+        printf("%d", pos);
+    return 0;
+}

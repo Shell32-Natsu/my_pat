@@ -1,0 +1,96 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+struct item{
+    int zhishu;
+    double xishu;
+};
+
+bool cmp(const item &a, const item &b)
+{
+    return a.zhishu > b.zhishu;
+}
+
+vector<item> A, B, ret;
+
+int main(void)
+{
+    int n;
+    int i,j;
+
+    scanf("%d", &n);
+    for(i = 0; i < n; i++){
+        item t;
+        scanf("%d%lg", &t.zhishu, &t.xishu);
+        A.push_back(t);
+    }
+
+    scanf("%d", &n);
+    for(i = 0; i < n; i++){
+        item t;
+        scanf("%d%lf", &t.zhishu, &t.xishu);
+        B.push_back(t);
+    }
+
+    for(auto i : A){
+        for(auto j : B){
+            item t;
+            t.xishu = i.xishu * j.xishu;
+            t.zhishu = i.zhishu + j.zhishu;
+            ret.push_back(t);
+        }
+    }
+
+    sort(ret.begin(), ret.end(), cmp);
+    vector<item> tmp;
+
+    int z = 0;
+    double x = 0;
+    for(i = 0; i < ret.size(); i++){
+        x = 0;
+        auto j = i;
+        while(ret[j].zhishu == ret[i].zhishu){
+            x += ret[j].xishu;
+            j++;
+            if(j == ret.size())
+                break;
+        }
+        item t;
+        t.zhishu = ret[i].zhishu;
+        t.xishu = x;
+        tmp.push_back(t);
+        if(j == ret.size())
+            break;
+        i = j - 1;
+    }
+
+    int total_num = 0;
+    for(i = 0; i < tmp.size(); i++){
+        if(fabs(tmp[i].xishu - 0) < 0.0000001)
+            continue;
+        total_num++;
+    }
+
+    char s_ret[1000] = "";
+
+    sprintf(s_ret, "%d ", total_num);
+
+    for(i = 0; i < tmp.size(); i++){
+        if(fabs(tmp[i].xishu - 0) < 0.0000001)
+                continue;
+        char s_t[50];
+
+        sprintf(s_t, "%d %.1f " , tmp[i].zhishu, tmp[i].xishu);
+        strcat(s_ret, s_t);
+    }
+
+    if(s_ret[strlen(s_ret) - 1] == ' ')
+        s_ret[strlen(s_ret) - 1] = 0;
+
+    printf("%s", s_ret);
+
+    return 0;
+}

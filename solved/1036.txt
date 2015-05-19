@@ -1,0 +1,60 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+using namespace std;
+
+struct stu{
+    string id, name;
+    char gender;
+    int score;
+};
+
+int main(void){
+    vector<stu> student;
+    int n;
+    cin>>n;
+    for(int i = 0; i < n; i++){
+        stu t;
+        cin>>t.name>>t.gender>>t.id>>t.score;
+        student.push_back(t);
+    }
+
+    sort(student.begin(), student.end(), [&](stu a, stu b){
+            if(a.gender == b.gender)
+                return a.score > b.gender;
+            return a.gender > b.gender;
+        });
+
+    /*for(auto i : student){
+        cout<<i.name<<' '<<i.id<<' '<<i.score<<endl;
+    }*/
+    if(student[0].gender == 'F'){
+        cout<<student[0].name<<' '<<student[0].id<<endl;
+        cout<<"Absent"<<endl<<"NA";
+    }
+    else{
+        auto i = student.begin();
+        for(; i != student.end(); i++){
+            if( (*i).gender == 'F' ){
+                cout<<(*i).name<<' '<<(*i).id<<endl;
+                cout<<(*(i - 1)).name<<' '<<(*(i - 1)).id<<endl;
+                cout<<(*i).score - (*(i - 1)).score;
+                break;
+            }
+        }
+        if(i == student.end()){
+            cout<<"Absent"<<endl;
+            cout<<(*(i - 1)).name<<' '<<(*(i - 1)).id<<endl;
+            cout<<"NA";
+        }
+    }
+    return 0;
+}

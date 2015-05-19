@@ -1,0 +1,100 @@
+#include <cstdio>
+#include <cstring>
+#include <vector>
+using namespace std;
+
+int n,m,k,del_node;
+
+struct g_node_list{
+    int next_pos;
+};
+
+struct g_node{
+    int pos;
+    int team_num;
+    bool has_checked = false;
+    bool valid = true;
+    vector<g_node_list> next_list;
+};
+
+vector<g_node> g;
+int total_team_tmp = 0, total_team = 0, total_path = 0;
+int deep_len = 0, start_end_len = 0;
+
+void deep_search(int node_pos)
+{
+    if(node_pos == del_node)
+        return;
+    if(g[node_pos].has_checked)
+        return;
+
+    g[node_pos].has_checked = true;
+    //printf("%d\n", node_pos);
+    for(auto i : g[node_pos].next_list){
+        if(i.next_pos == del_node)
+            continue;
+        deep_search(i.next_pos);
+    }
+}
+
+void init_g(void)
+{
+    for(auto &i : g){
+        i.has_checked = false;
+    }
+}
+
+int all_linked(void)
+{
+    for(auto i = g.begin(); i != g.end(); i++){
+        if((*i).valid == true && (*i).has_checked == false)
+            return i - g.begin();
+    }
+    return -1;
+}
+
+
+int main(void)
+{
+    int i,j;
+    scanf("%d%d%d", &n, &m, &k);
+    for(i = 0; i < n; i++){
+        g_node t;
+        t.pos = i;
+        g.push_back(t);
+    }
+
+    for(i = 0; i < m; i++){
+        int a,b;
+        scanf("%d%d", &a, &b);
+        g_node_list tmp;
+        tmp.next_pos = b - 1;
+        g[a - 1].next_list.push_back(tmp);
+        tmp.next_pos = a - 1;
+        g[b - 1].next_list.push_back(tmp);
+    }
+
+    /*for(auto i : g){
+        printf("%d %d\n", i.pos, i.next_list.size());
+    }*/
+
+    for(i = 0; i < k; i++){
+        init_g();
+        scanf("%d", &del_node);
+        del_node--;
+
+        g[del_node].valid = false;
+        int start_node = del_node == 0 ? 1 : 0;
+        //printf("del_node=%d start_node=%d:\n", del_node, start_node);
+        int pos, ret = 0;
+        while((pos = all_linked()) != -1){
+            deep_search(pos);
+            ret++;
+        }
+        printf("%d\n", ret - 1);
+        g[del_node].valid = true;
+    }
+    //printf("%d %d", total_path, total_team);
+
+    return 0;
+}

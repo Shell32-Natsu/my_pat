@@ -1,0 +1,119 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100001
+//不用队列的话可以使用双指针进行模拟
+
+int arr[MMAXLEN];
+
+int main(void){
+    int n, m;
+    scanf("%d%d", &n, &m);
+    for(int i = 0; i < n; i++)
+        scanf("%d", &arr[i]);
+
+    /*int min_pay = INT_MAX;
+    vector<int> ret;
+    for(int i = 0; i < n; i++){
+        int sum = 0, j;
+        for(j = i; j < n; j++){
+            sum += arr[j];
+            if(sum > min_pay)
+                break;
+            if(sum >= m && sum < min_pay){
+                min_pay = sum;
+                ret.clear();
+                ret.push_back(i + 1);
+                ret.push_back(j + 1);
+                break;
+            }
+            if(sum >= m && sum == min_pay){
+                ret.push_back(i + 1);
+                ret.push_back(j + 1);
+            }
+        }
+        if(j < n)
+            continue;
+    }
+    for(int i = 0; i < ret.size(); i+=2)
+        printf("%d-%d\n", ret[i], ret[i + 1]);*/
+
+    vector<int> ret;
+    int sum = 0, min_pay = INT_MAX, start_pos = 0;
+    queue<int> q;
+    for(int i = 0; i < n; i++){
+        if(sum > min_pay){
+            while(sum > min_pay){
+                sum -= q.front();
+                q.pop();
+                start_pos++;
+            }
+        }
+        else if(sum == min_pay){
+            while(sum >= min_pay){
+                sum -= q.front();
+                q.pop();
+                start_pos++;
+            }
+        }
+        int j = i;
+        while(sum < m && j < n){
+            sum += arr[j];
+            q.push(arr[j++]);
+        }
+        if(sum < min_pay){
+            min_pay = sum;
+            ret.clear();
+            ret.push_back(start_pos + 1);
+            ret.push_back(j);
+        }
+        else if(sum == min_pay){
+            ret.push_back(start_pos + 1);
+            ret.push_back(j);
+        }
+        i = j - 1;
+    }
+    if(sum > min_pay){
+        int t = sum, t2 = start_pos;
+        auto tt = q;
+        while(sum > min_pay){
+            sum -= q.front();
+            q.pop();
+            start_pos++;
+        }
+        if(sum == min_pay){
+            ret.push_back(start_pos + 1);
+            ret.push_back(n);
+        }
+        sum = t;
+        q = tt;
+        start_pos = t2;
+    }
+    if(sum > m){
+        while(sum > m){
+            sum -= q.front();
+            q.pop();
+            start_pos++;
+        }
+        if(sum == m){
+            ret.clear();
+            ret.push_back(start_pos + 1);
+            ret.push_back(n);
+        }
+    }
+    for(int i = 0; i < ret.size(); i+=2)
+        printf("%d-%d\n", ret[i], ret[i + 1]);
+
+    return 0;
+}

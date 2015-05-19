@@ -1,0 +1,51 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+using namespace std;
+
+struct node{
+    char c;
+    int next_node;
+};
+
+node mlist[500001];
+
+int main(void){
+    int start1, start2, n;
+    scanf("%d%d%d", &start1, &start2, &n);
+    for(int i = 0; i < n; i++){
+        int addr;
+        scanf("%d", &addr);
+        getchar();
+        scanf("%c%d", &(mlist[addr].c), &(mlist[addr].next_node));
+    }
+    int len1, len2, p = start1;
+    for(len1 = 0; p != -1; len1++, p = mlist[p].next_node);
+    for(len2 = 0, p = start2; p != -1; len2++, p = mlist[p].next_node);
+
+    //printf("%d %d", len1, len2);
+    int p1 = start1, p2 = start2;
+    if(len1 > len2){
+        for(int i = 0; i < len1 - len2; i++)
+            p1 = mlist[p1].next_node;
+    }else{
+        for(int i = 0; i < len2 - len1; i++)
+            p2 = mlist[p2].next_node;
+    }
+
+    for(; p1 != p2 && p1 != -1 && p2 != -1; p1 = mlist[p1].next_node, p2 = mlist[p2].next_node);
+    if(p1 == p2 && p1 != -1)
+        printf("%05d", p1);
+    else
+        printf("-1");
+
+    return 0;
+}

@@ -1,0 +1,77 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+using namespace std;
+
+struct station{
+    double price;
+    int len;
+};
+
+station stations[501];
+
+int main(void){
+    int capacity, distance, avg_distance, station_num;
+    scanf("%d%d%d%d", &capacity, &distance, &avg_distance, &station_num);
+    for(int i = 0; i < station_num; i++)
+        scanf("%lf%d", &(stations[i].price), &(stations[i].len));
+    stations[station_num].len = distance, stations[station_num].price = 0;
+
+    sort(stations, stations + station_num, [&](station a, station b){
+            return a.len < b.len;
+         });
+
+    /*for(int i = 0; i < station_num; i++)
+        printf("%d => len:%d, price:%g\n", i + 1, stations[i].len, stations[i].price);*/
+
+    int cur_gas = 0, cur_len = 0, max_len = capacity * avg_distance, i;
+    double total_cost = 0.0;
+    for(i = 0; i < station_num; i++){
+        if(stations[i + 1].len - stations[i].len > capacity * avg_distance)
+            break;
+        //if(cur_gas /** avg_distance*/ < stations[i + 1].len - stations[i].len){
+            int next_station = -1;
+            for(int j = i + 1; j < station_num && stations[j].len <= stations[i].len + max_len; j++){
+                if(stations[j].price < stations[i].price){
+                    next_station = j;
+                    break;
+                }
+            }
+            if(i == station_num - 1)
+                next_station = i + 1;
+            if(next_station != -1){
+                if(cur_gas < stations[next_station].len - stations[i].len){
+                    total_cost += (stations[next_station].len - stations[i].len - cur_gas) / (double)avg_distance * stations[i].price;
+                    //printf("第%d个加油站加油%g,", i + 1, (stations[next_station].len - stations[i].len - cur_gas) / (double)avg_distance);
+                    cur_gas = (stations[next_station].len - stations[i].len);
+                }
+            }
+            else{
+                total_cost += (capacity * avg_distance - cur_gas) / (double)avg_distance * stations[i].price;
+                //printf("第%d个加油站加满，加了%g,", i + 1, (capacity * avg_distance - cur_gas) / (double)avg_distance);
+                cur_gas = capacity * avg_distance;
+            }
+        //}
+        if(cur_gas > capacity * avg_distance){
+            break;
+        }
+        //printf("第%d个加油站，剩余油量为%g\n", i + 1, cur_gas / (double)avg_distance);
+        cur_gas -= (stations[i + 1].len - stations[i].len);
+    }
+    if(i == station_num)
+        printf("%.2f", total_cost);
+    else if(stations[0].len > 0)
+        printf("The maximum travel distance = %.2f", 0.0);
+    else
+        printf("The maximum travel distance = %.2f", (double)stations[i].len + capacity * avg_distance);
+
+    return 0;
+}

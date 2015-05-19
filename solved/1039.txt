@@ -1,0 +1,57 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 10001
+struct stu{
+    string name;
+    int c;
+};
+
+vector<int> stu_arr[26*26*26*10];
+
+int main(void){
+    int n, k;
+    scanf("%d%d", &n, &k);
+    int arr_num = 0;
+    for(int i = 0; i < k; i++){
+        int course, num;
+        scanf("%d%d", &course, &num);
+        char c_str[5];
+        for(int j = 0; j < num; j++){
+            scanf("%s", c_str);
+            int pos = (c_str[0] - 'A') * 26 * 26 * 10 + (c_str[1] - 'A') * 26 *10 + (c_str[2] - 'A') * 10 + c_str[3] - '0';
+            stu_arr[pos].push_back(course);
+        }
+    }
+
+    for(int i = 0; i < n; i++){
+        char c_str[10];
+        scanf("%s", c_str);
+
+        int pos = (c_str[0] - 'A') * 26 * 26 * 10 + (c_str[1] - 'A') * 26 *10 + (c_str[2] - 'A') * 10 + c_str[3] - '0';
+        if(!stu_arr[pos].empty()){
+            printf("%s %d ", c_str, stu_arr[pos].size());
+            sort(stu_arr[pos].begin(), stu_arr[pos].end());
+            int l = stu_arr[pos].size();
+            for(int ii = 0; ii < l - 1; ii++){
+                printf("%d ", stu_arr[pos][ii]);
+            }
+            printf("%d\n", stu_arr[pos][l - 1]);
+        }
+        else{
+            printf("%s 0\n", c_str);
+        }
+    }
+    return 0;
+}

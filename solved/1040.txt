@@ -1,0 +1,43 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 10001
+
+bool is_huiwen(char *a, char *b){
+    while(a < b){
+        if(*a != *b)
+            return false;
+        a++;
+        b--;
+    }
+    return true;
+}
+
+int main(void){
+    char str[1024];
+    gets(str);
+    char *a = str, *b = str + 1;
+    int max_length = 1;
+    while(strlen(a) > max_length){
+        for(b = a + max_length; *b != 0; b++){
+            if(is_huiwen(a, b)){
+                if(b - a + 1 > max_length)
+                    max_length = b - a + 1;
+            }
+        }
+        a++;
+    }
+    printf("%d", max_length);
+    return 0;
+}

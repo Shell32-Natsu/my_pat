@@ -1,0 +1,195 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <list>
+#include <string>
+#include <algorithm>
+#include <cmath>
+using namespace std;
+
+struct book_item{
+    string book_id;
+    string title, author, publisher, published_year;
+    vector<string> key_words;
+};
+
+bool cmp_book_by_id(book_item a, book_item b){
+    return a.book_id < b.book_id;
+}
+
+struct year_list{
+    string year;
+    vector<string> book_id;
+};
+
+struct publisher_list{
+    string publisher;
+    vector<string> book_id;
+};
+
+struct key_word_list{
+    string key_word;
+    vector<string> book_id;
+};
+
+int main(void){
+    vector<book_item> books;
+    int n;
+    cin>>n;
+    string tmp;
+    getline(cin, tmp);//�̵��س�
+    for(int i = 0; i < n; i++){
+        book_item t;
+        getline(cin, t.book_id);
+        getline(cin, t.title);
+        getline(cin, t.author);
+        string key_words;
+        getline(cin, key_words);
+        auto j = key_words.begin(), k = key_words.begin();
+        for(; j != key_words.end(); j++){
+            if(*j == ' '){
+                t.key_words.push_back(key_words.substr(k - key_words.begin(), j - k));
+                k = j + 1;
+            }
+        }
+        t.key_words.push_back(key_words.substr(k - key_words.begin(), j - k));
+        getline(cin, t.publisher);
+        getline(cin, t.published_year);
+        books.push_back(t);
+    }
+
+    sort(books.begin(), books.end(), cmp_book_by_id);
+
+    /*for(auto i : books){
+        cout<<"id:"<<i.book_id<<endl;
+        cout<<"title:"<<i.title<<endl<<endl;
+    }*/
+
+    vector<publisher_list> publisher_lists;
+    vector<year_list> year_lists;
+    vector<key_word_list> key_word_lists;
+
+    for(auto i = books.begin(); i != books.end(); i++){
+        bool find_flag = false;
+        for(auto j = publisher_lists.begin(); j != publisher_lists.end(); j++){
+            if((*j).publisher == (*i).publisher){
+                (*j).book_id.push_back((*i).book_id);
+                find_flag = true;
+                break;
+            }
+        }
+        if(!find_flag){
+            publisher_list t;
+            t.book_id.push_back( (*i).book_id );
+            t.publisher = (*i).publisher;
+            publisher_lists.push_back(t);
+        }
+
+        find_flag = false;
+        for(auto j = year_lists.begin(); j != year_lists.end(); j++){
+            if( (*j).year == (*i).published_year ){
+                (*j).book_id.push_back((*i).book_id);
+                find_flag = true;
+                break;
+            }
+        }
+        if(!find_flag){
+            year_list t;
+            t.book_id.push_back( (*i).book_id );
+            t.year = (*i).published_year;
+            year_lists.push_back(t);
+        }
+
+        for(auto j = (*i).key_words.begin(); j != (*i).key_words.end(); j++){
+            find_flag = false;
+            for(auto k = key_word_lists.begin(); k != key_word_lists.end(); k++){
+                if( (*k).key_word  == (*j)){
+                    (*k).book_id.push_back((*i).book_id);
+                    find_flag = true;
+                    break;
+                }
+            }
+            if(!find_flag){
+                key_word_list t;
+                t.book_id.push_back( (*i).book_id );
+                t.key_word = (*j);
+                key_word_lists.push_back(t);
+            }
+        }
+    }
+
+    int m;
+    cin>>m;
+    getline(cin, tmp);
+    for(int i = 0; i < m; i++){
+        string q;
+        getline(cin, q);
+        cout<<q<<endl;
+        switch(q[0]){
+            bool find_flag;
+            case '1':
+                find_flag = false;
+                for(auto j = books.begin(); j != books.end(); j++){
+                    if( (*j).title == q.substr(3) ){
+                        cout<<(*j).book_id<<endl;
+                        find_flag = true;
+                    }
+                }
+                if(!find_flag)
+                    cout<<"Not Found"<<endl;
+                break;
+            case '2':
+                find_flag = false;
+                for(auto j = books.begin(); j != books.end(); j++){
+                    if( (*j).author == q.substr(3) ){
+                        cout<<(*j).book_id<<endl;
+                        find_flag = true;
+                    }
+                }
+                if(!find_flag)
+                    cout<<"Not Found"<<endl;
+                break;
+            case '3':
+                find_flag = false;
+                for(auto j = key_word_lists.begin(); j != key_word_lists.end(); j++){
+                    string key = q.substr(3);
+                    if( (*j).key_word == key ){
+                        for(auto k = (*j).book_id.begin(); k != (*j).book_id.end(); k++)
+                            cout<<*k<<endl;
+                        find_flag = true;
+                    }
+                }
+                if(!find_flag)
+                    cout<<"Not Found"<<endl;
+                break;
+            case '4':
+                find_flag = false;
+                for(auto j = publisher_lists.begin(); j != publisher_lists.end(); j++){
+                    if( (*j).publisher == q.substr(3) ){
+                        for(auto k = (*j).book_id.begin(); k != (*j).book_id.end(); k++)
+                            cout<<*k<<endl;
+                        find_flag = true;
+                    }
+                }
+                if(!find_flag)
+                    cout<<"Not Found"<<endl;
+                break;
+            case '5':
+                find_flag = false;
+                for(auto j = year_lists.begin(); j != year_lists.end(); j++){
+                    if( (*j).year == q.substr(3) ){
+                        for(auto k = (*j).book_id.begin(); k != (*j).book_id.end(); k++)
+                            cout<<*k<<endl;
+                        find_flag = true;
+                    }
+                }
+                if(!find_flag)
+                    cout<<"Not Found"<<endl;
+                break;
+        }
+    }
+
+    return 0;
+}

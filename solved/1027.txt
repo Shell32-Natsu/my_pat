@@ -1,0 +1,43 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+using namespace std;
+
+void trans(int a, char *ret){
+    strcpy(ret, "00");
+    int i = 0;
+    while(a > 0){
+        int m = a % 13;
+        if(m >= 10){
+            ret[i++] = 'A' + m - 10;
+        }else{
+            ret[i++] = '0' + m;
+        }
+        a /= 13;
+    }
+    //ret[i] = 0;
+    char t = ret[1];
+    ret[1] = ret[0];
+    ret[0] = t;
+}
+
+int main(void){
+    int r, g, b;
+    cin>>r>>g>>b;
+    char tmp[10], ret[50] = "#";
+    trans(r, tmp);
+    strcat(ret, tmp);
+    trans(g, tmp);
+    strcat(ret, tmp);
+    trans(b, tmp);
+    strcat(ret, tmp);
+    cout<<ret;
+
+    return 0;
+}

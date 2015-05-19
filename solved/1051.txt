@@ -1,0 +1,58 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 10002
+
+int main(void){
+    int n, k ,m;
+    scanf("%d%d%d", &n, &k, &m);
+    getchar();
+    vector<int> mstack;
+    for(int i = 0; i < m; i++){
+        mstack.clear();
+        int t, val_to_push = 1, j;
+        char *in = new char[5000];
+        gets(in);
+        for(j = 0; j < k; j++){
+            sscanf(in, "%d", &t);
+            for(; *in != ' ' && *in != 0; in++);
+            in++;
+            /*if(val_to_push > t){
+                printf("NO\n");
+                break;
+            }*/
+            if(!mstack.empty() && mstack.back() > t){
+                printf("NO\n");
+                break;
+            }
+            if(mstack.empty() || mstack.back() < t){
+                for(; val_to_push <= t; val_to_push++){
+                    mstack.push_back(val_to_push);
+                    if(mstack.size() > n){
+                        printf("NO\n");
+                        break;
+                    }
+                }
+                if(val_to_push != t + 1)
+                    break;
+            }
+            if(mstack.back() == t)
+                mstack.pop_back();
+        }
+        if(j == k)
+            printf("YES\n");
+    }
+    //system("pause");
+    return 0;
+}

@@ -1,0 +1,63 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+using namespace std;
+
+char username[1001][15];
+char passwd[1001][15];
+
+int main(void){
+    int n;
+    scanf("%d", &n);
+    int ins = 0;
+    for(int i = 0; i < n; i++){
+        char u[15], p[15];
+        scanf("%s%s", u, p);
+        bool flag = false;
+        for(int j = 0; j < strlen(p); j++){
+            if(p[j] == 'l' || p[j] == '1' || p[j] == 'O' || p[j] == '0'){
+                flag = true;
+                switch(p[j]){
+                    case 'l':
+                        p[j] = 'L';
+                        break;
+                    case '1':
+                        p[j] = '@';
+                        break;
+                    case '0':
+                        p[j] = '%';
+                        break;
+                    case 'O':
+                        p[j] = 'o';
+                        break;
+                }
+            }
+        }
+        if(flag){
+            strcpy(username[ins], u);
+            strcpy(passwd[ins++], p);
+        }
+    }
+
+    if(ins > 0){
+        printf("%d\n", ins);
+        for(int i = 0; i < ins; i++){
+            printf("%s %s\n", username[i], passwd[i]);
+        }
+    }
+    else{
+        if(n == 1)
+            printf("There is 1 account and no account is modified");
+        else
+            printf("There are %d accounts and no account is modified", n);
+    }
+    return 0;
+}

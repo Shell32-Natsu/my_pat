@@ -1,0 +1,52 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100002
+
+struct stu{
+	int n;
+	char str[5];
+};
+
+bool cmp(stu a, stu b){return a.n < b.n;}
+
+vector<stu> arr[2501];
+
+int main(void){
+	int n, k;
+	scanf("%d%d", &n, &k);
+	for(int i = 0; i < n; i++){
+		char sstu[5];
+		int t;
+		scanf("%s%d", sstu, &t);
+		int nstu = (sstu[0] - 'A') * 26 * 26 * 10 + (sstu[1] - 'A') * 26 * 10 + (sstu[2] - 'A') * 10 + sstu[3] - '0';
+		for(int j = 0; j < t; j++){
+			int c;
+			scanf("%d", &c);
+			stu tmp;
+			tmp.n = nstu;
+			strcpy(tmp.str, sstu);
+			arr[c].push_back(tmp);
+		}
+	}
+
+	for(int i = 1; i <= k; i++){
+		printf("%d %d\n", i, arr[i].size());
+		sort(arr[i].begin(), arr[i].end(), cmp);
+		for(vector<stu>::iterator j = arr[i].begin(); j != arr[i].end(); j++)
+			printf("%s\n", (*j).str);
+	}
+	system("pause");
+	return 0;
+}

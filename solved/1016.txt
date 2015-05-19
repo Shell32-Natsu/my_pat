@@ -1,0 +1,183 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <vector>
+#include <queue>
+#include <string>
+#include <algorithm>
+using namespace std;
+
+int rate_per_hour[24];
+
+struct date_time{
+    int month, day, hour, minute;
+    date_time(int m = 0, int d = 0, int h = 0, int mm = 0):
+        month(m), day(d), hour(h), minute(mm){}
+};
+
+struct input_line{
+    string m_username;
+    date_time m_time;
+    int m_state;//on-line => 1, off-line => 0
+};
+
+struct phone_record{
+    date_time m_start_time, m_end_time;
+    int total_time;
+    double cost;
+};
+
+struct user{
+    string m_username;
+    vector<phone_record> m_phone;
+};
+
+input_line input_arr[1000];
+bool cmp_date_time(date_time a, date_time b)
+{
+    if(a.month == b.month){
+        if(a.day == b.day){
+            if(a.hour == b.hour){
+                return a.minute < b.minute;
+            }else
+                return a.hour < b.hour;
+        }else
+            return a.day < b.day;
+    }else
+        return a.month < b.month;
+}
+
+bool cmp_input_arr(input_line a, input_line b)
+{
+    if(a.m_username == b.m_username){
+        return cmp_date_time(a.m_time, b.m_time);
+    }else
+        return a.m_username < b.m_username;
+}
+
+int minus_date_time(date_time &a, date_time &b)
+{
+    int ret = 0;
+    ret += (a.day - b.day) * 24 * 60;
+    ret += (a.hour - b.hour) * 60;
+    ret += (a.minute - b.minute);
+    return ret;
+}
+
+void calc_cost(phone_record &record)
+{
+    double ret = 0;
+    date_time t = record.m_end_time;
+    if(record.m_end_time.day == record.m_start_time.day){
+        if(record.m_end_time.hour == record.m_start_time.hour)
+            record.cost = (record.m_end_time.minute - record.m_start_time.minute) * rate_per_hour[record.m_end_time.hour];
+        else{
+            ret += t.minute * rate_per_hour[t.hour];
+            t.minute = 0;
+            for(t.hour--; t.hour > record.m_start_time.hour; t.hour--){
+                ret += 60 * rate_per_hour[t.hour];
+            }
+            ret += (60 - record.m_start_time.minute) * rate_per_hour[record.m_start_time.hour];
+            record.cost = ret;
+        }
+    }else{
+        int whole_day = record.m_end_time.day - record.m_start_time.day - 1;
+        double per_day_cost = 0;
+        for(int i = 0; i < 24; i++)
+            per_day_cost += 60 * rate_per_hour[i];
+        ret += whole_day * per_day_cost;
+
+        date_time t_e = record.m_end_time, t_s = record.m_start_time;
+        ret += t_e.minute * rate_per_hour[t_e.hour];
+        for(t_e.hour--; t_e.hour >= 0; t_e.hour--){
+            ret += 60 * rate_per_hour[t_e.hour];
+        }
+
+        ret += (60 - t_s.minute) * rate_per_hour[t_s.hour];
+        for(t_s.hour++; t_s.hour < 24; t_s.hour++){
+            ret += 60 * rate_per_hour[t_s.hour];
+        }
+        record.cost = ret;
+    }
+}
+
+int main(void)
+{
+    for(int i = 0; i < 24; i++)
+        cin>>rate_per_hour[i];
+
+    int n;
+    cin>>n;
+
+    for(int i = 0; i < n; i++){
+        cin>>input_arr[i].m_username;
+        scanf("%d:%d:%d:%d", &(input_arr[i].m_time.month), &(input_arr[i].m_time.day),
+                                &(input_arr[i].m_time.hour), &(input_arr[i].m_time.minute));
+        string s_t;
+        cin>>s_t;
+        if(s_t == "on-line")
+            input_arr[i].m_state = 1;
+        else
+            input_arr[i].m_state = 0;
+    }
+
+    sort(input_arr, input_arr + n, cmp_input_arr);
+    /*for(int i = 0; i < n; i++){
+        cout<<input_arr[i].m_username<<' '
+            <<input_arr[i].m_time.month<<':'<<input_arr[i].m_time.day<<':'
+            <<input_arr[i].m_time.hour<<':'<<input_arr[i].m_time.minute<<' '
+            <<input_arr[i].m_state<<endl;
+    }*/
+    vector<user> users;
+    input_line pair1 = input_arr[0], pair2;
+    for(int i = 1; i < n; i++){
+        pair2 = input_arr[i];
+        if(pair1.m_username == pair2.m_username && pair1.m_state == 1 && pair2.m_state == 0){
+            int j;
+            for(j = 0; j < users.size(); j++){
+                if(users[j].m_username == pair1.m_username){
+                    phone_record t;
+                    t.m_start_time = pair1.m_time;
+                    t.m_end_time = pair2.m_time;
+                    t.total_time = minus_date_time(t.m_end_time, t.m_start_time);
+                    calc_cost(t);
+                    users[j].m_phone.push_back(t);
+                    break;
+                }
+            }
+            if(j == users.size()){
+                user t;
+                t.m_username = pair1.m_username;
+                phone_record tt;
+                tt.m_start_time = pair1.m_time;
+                tt.m_end_time = pair2.m_time;
+                tt.total_time = minus_date_time(tt.m_end_time, tt.m_start_time);
+                calc_cost(tt);
+                t.m_phone.push_back(tt);
+                users.push_back(t);
+            }
+        }
+        pair1 = pair2;
+
+    }
+
+    int now_month = users[0].m_phone[0].m_start_time.month;
+
+    for(int i = 0; i < users.size(); i++){
+        printf("%s %02d\n", users[i].m_username.c_str(), now_month);
+        double total_coat = 0;
+        for(int j = 0; j < users[i].m_phone.size(); j++){
+            printf("%02d:%02d:%02d %02d:%02d:%02d %d $%.2f\n", users[i].m_phone[j].m_start_time.day,
+                   users[i].m_phone[j].m_start_time.hour, users[i].m_phone[j].m_start_time.minute,
+                   users[i].m_phone[j].m_end_time.day,
+                   users[i].m_phone[j].m_end_time.hour, users[i].m_phone[j].m_end_time.minute,
+                   users[i].m_phone[j].total_time, users[i].m_phone[j].cost / 100);
+
+            total_coat += users[i].m_phone[j].cost / 100;
+        }
+        printf("Total amount: $%.2f\n", total_coat);
+    }
+
+
+    return 0;
+}

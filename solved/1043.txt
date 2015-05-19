@@ -1,0 +1,106 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 40001
+int tree[1001];
+int post_order[1001];
+int in_order[1001];
+int n;
+
+bool is_BST(int start, int end, bool mirror){
+    if(end - start <= 1)
+        return true;
+    if(mirror){
+        int i;
+        for(i = start + 1; i < end && tree[i] >= tree[start]; i++);
+        int mid = i;
+        for(; i < end; i++){
+            if(tree[i] >= tree[start])
+                return false;
+        }
+        return is_BST(start + 1, mid, mirror) && is_BST(mid, end, mirror);
+    }
+    else{
+        int i;
+        for(i = start + 1; i < end && tree[i] < tree[start]; i++);
+        int mid = i;
+        for(; i < end; i++){
+            if(tree[i] < tree[start])
+                return false;
+        }
+        return is_BST(start + 1, mid, mirror) && is_BST(mid, end, mirror);
+    }
+}
+
+void build_post_order(int pre_start, int in_start, int post_start, int len, int left_or_right){
+    if(len == 1){
+        int root = tree[pre_start];
+        post_order[post_start] = root;
+        return;
+    }
+    if(len == 0)
+        return;
+    int root = tree[pre_start];
+    //if(!left_or_right){//§Ù?§Ù§Ô§¼?
+    post_order[post_start + len - 1] = root;
+    int root_in_order = in_start;
+    for(; in_order[root_in_order] != root && root_in_order < in_start + len; root_in_order++);
+    if(left_or_right){
+        for(; in_order[root_in_order] == root && root_in_order < in_start + len; root_in_order++);
+        root_in_order--;
+    }
+    build_post_order(pre_start + 1, in_start, post_start, root_in_order - in_start, left_or_right);
+    build_post_order(pre_start + 1 + root_in_order - in_start, root_in_order + 1, post_start + root_in_order - in_start, in_start + len - root_in_order - 1, left_or_right);
+    //}
+    /*else{
+        post_order[post_start + len - 1] = root;
+        int root_in_order = in_start;
+        for(; in_order[root_in_order] != root; root_in_order++);
+        build_post_order(pre_start + 1, in_start, post_start, root_in_order - in_start, 0);
+        build_post_order(pre_start + l + root_in_order - in_star, root_in_order + 1, post_start + root_in_order - in_start, len - root_in_order - 1, 1);
+    }*/
+}
+
+int main(void){
+    scanf("%d", &n);
+    for(int i = 0; i < n; i++)
+        scanf("%d", &tree[i]);
+    bool BST;
+    if(n == 1){
+        printf("YES\n");
+        BST = true;
+    }
+    else{
+        if(tree[1] >= tree[0])
+            BST = is_BST(0, n, true);
+        else
+            BST = is_BST(0, n, false);
+        printf("%s\n", BST ? "YES" : "NO");
+    }
+    if(BST){
+        memcpy(in_order, tree, n * sizeof(int));
+        if(tree[1] < tree[0])
+            sort(in_order, in_order + n);
+        else
+            sort(in_order, in_order + n, greater<int>());
+        /*for(int i = 0; i < n; i++)
+            cout<<in_order[i]<<' ';*/
+        build_post_order(0, 0, 0, n, tree[1] >= tree[0]);
+        for(int i = 0; i < n - 1; i++)
+            printf("%d ", post_order[i]);
+        printf("%d", post_order[n - 1]);
+    }
+
+    return 0;
+}

@@ -1,0 +1,63 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <cmath>
+using namespace std;
+
+bool is_valid(char *a){
+    int len = strlen(a);
+    for(int i = 0; i < len / 2; i++){
+        if(a[i] != a[len - 1 - i])
+            return false;
+    }
+    return true;
+}
+
+void add_str(char *a, char *b){
+    int jw = 0, len = strlen(a), j = 0;
+    char ret[100];
+    for(int i = len - 1; i >= 0; i--){
+        ret[j++] = ((a[i] - '0') + (b[i] - '0') + jw) % 10 + '0';
+        jw = ((a[i] - '0') + (b[i] - '0') + jw) / 10;
+    }
+    if(jw)
+        ret[j++] = '1';
+    ret[j] = 0;
+
+    for(int i = 0; i < strlen(ret) / 2; i++){
+        char t = ret[i];
+        ret[i] = ret[strlen(ret) - i - 1];
+        ret[strlen(ret) - i - 1] = t;
+    }
+
+    strcpy(a, ret);
+}
+
+int func(char *a, char *b, int k){
+    int time = 0;
+    while(!is_valid(a) && time + 1 <= k){
+        int len = strlen(a);
+        for(int i = 0; i < len; i++)
+            b[len - 1- i] = a[i];
+        b[len] = 0;
+
+        add_str(a, b);
+        time++;
+    }
+    return time;
+}
+
+int main(void){
+    char in_str[100], out_str[100];
+    int k;
+    cin>>in_str>>k;
+
+    int time = func(in_str, out_str, k);
+    cout<<in_str<<endl<<time;
+
+    return 0;
+}

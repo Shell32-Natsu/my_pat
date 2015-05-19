@@ -1,0 +1,106 @@
+#include <cstdio>
+#include <cstring>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+string trans(string a, int from_radix, int to_radix)
+{
+    long long ta = 0,tb = 1;
+    for(int i = a.length() - 1; i >= 0; i--){
+        if(isdigit(a[i])){
+            ta += (a[i] - '0') * tb;
+        }else if(isalpha(a[i])){
+            ta += (a[i] - 'a' + 10) * tb;
+        }
+        tb *= from_radix;
+    }
+
+    char ret_c[500];
+    int i = 0;
+    while(ta > 0){
+        int mod_num = (ta % to_radix);
+        if(mod_num < 10)
+            ret_c[i++] = mod_num + '0';
+        else
+            ret_c[i++] = mod_num - 10 + 'a';
+        ta /= to_radix;
+    }
+    ret_c[i] = 0;
+
+    for(i = 0; i < strlen(ret_c) / 2; i++){
+        char t = ret_c[i];
+        ret_c[i] = ret_c[strlen(ret_c) - i - 1];
+        ret_c[strlen(ret_c) - i - 1] = t;
+    }
+
+    return string(ret_c);
+}
+
+int main(void)
+{
+    string a,b;
+    int tag,radix,i;
+    cin>>a>>b>>tag>>radix;
+    if(radix <= 1){
+        if(tag == 1){
+            if(b == "0")
+                printf("1");
+            else
+                printf("Impossible");
+        }else{
+            if(a == "0")
+                printf("1");
+            else
+                printf("Impossible");
+        }
+    }
+    else{
+        if(tag == 1){
+            char max_c = 0;
+            for(i = 0; i < b.length(); i++){
+                if(b[i] > max_c)
+                    max_c = b[i];
+            }
+            int min_radix;
+            if(isdigit(max_c))
+                min_radix = max_c - '0';
+            else
+                min_radix = max_c - 'a' + 10;
+
+            for(i = min_radix + 1; i < 37; i++){
+                if(trans(b, i, radix) == a){
+                    printf("%d", i);
+                    break;
+                }
+            }
+            if(i == 37)
+                printf("Impossible");
+        }else{
+            char max_c = 0;
+            for(i = 0; i < a.length(); i++){
+                if(a[i] > max_c)
+                    max_c = a[i];
+            }
+            int min_radix;
+            if(isdigit(max_c))
+                min_radix = max_c - '0';
+            else
+                min_radix = max_c - 'a' + 10;
+
+            for(i = min_radix + 1; i < 37; i++){
+                if(trans(a, i, radix) == b){
+                    printf("%d", i);
+                    break;
+                }
+            }
+            if(i == 37)
+                printf("Impossible");
+        }
+    }
+
+
+    return 0;
+}

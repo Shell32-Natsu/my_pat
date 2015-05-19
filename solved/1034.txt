@@ -1,0 +1,111 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+using namespace std;
+
+struct node{
+    int u;
+    int weight = 0;
+    string name;
+    vector<int> next_list;
+};
+
+struct gang{
+    int people, total_weight;
+    string head;
+};
+
+node parr[2002];
+
+int main(void){
+    int n, k;
+    cin>>n>>k;
+    int parr_p = 0, t_u = 0;
+    for(int i = 0; i < n; i++){
+        string a, b;
+        int w;
+        cin>>a>>b>>w;
+        int a_pos = -1, b_pos = -1;
+        for(int j = 0; j < parr_p; j++){
+            if(a_pos != -1 && b_pos != -1)
+                break;
+            if(parr[j].name == a)
+                a_pos = j;
+            else if(parr[j].name == b)
+                b_pos = j;
+        }
+
+        if(a_pos > -1 && b_pos > -1){
+            int ub = parr[b_pos].u, ua = parr[a_pos].u;
+            for(int j = 0; j < parr_p; j++){
+                if(parr[j].u == ub)
+                    parr[j].u = ua;
+            }
+            parr[a_pos].weight += w;
+            parr[b_pos].weight += w;
+        }
+        else if(a_pos == -1 && b_pos > -1){
+            parr[parr_p].name = a;
+            parr[parr_p].u = parr[b_pos].u;
+            parr[parr_p++].weight += w;
+            parr[b_pos].weight += w;
+        }
+        else if(a_pos > -1 && b_pos == -1){
+            parr[parr_p].name = b;
+            parr[parr_p].u = parr[a_pos].u;
+            parr[parr_p++].weight += w;
+            parr[a_pos].weight += w;
+        }
+        else{
+            parr[parr_p].name = a;
+            parr[parr_p].u = t_u;
+            parr[parr_p++].weight += w;
+            parr[parr_p].name = b;
+            parr[parr_p].u = t_u++;
+            parr[parr_p++].weight += w;
+        }
+    }
+    sort(parr, parr + parr_p, [&](node a, node b){
+            if(a.u == b.u)
+                return a.weight > b.weight;
+            return a.u < b.u;
+         });
+
+    /*for(int i = 0; i < parr_p; i++)
+        cout<<parr[i].u<<'\t'<<parr[i].name<<'\t'<<parr[i].weight<<endl;*/
+    vector<gang> gangs;
+    for(int i = 0; i < parr_p; i++){
+        int j, tw = 0;
+        for(j = i; j < parr_p && parr[j].u == parr[i].u; j++)
+            tw += parr[j].weight;
+        int num = j - i;
+        if(num > 2 && tw / 2 > k){
+            gang t;
+            t.head = parr[i].name;
+            t.people = num;
+            t.total_weight = tw / 2;
+            gangs.push_back(t);
+        }
+        i = j - 1;
+    }
+
+    sort(gangs.begin(), gangs.end(), [&](gang a, gang b){
+            return a.head < b.head;
+         });
+
+    cout<<gangs.size()<<endl;
+    for(auto i : gangs){
+        cout<<i.head<<' '<<i.people<<endl;
+    }
+
+
+    return 0;
+}
