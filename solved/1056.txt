@@ -1,0 +1,67 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 1002
+
+int np, ng;
+int weight[MMAXLEN];
+int order[MMAXLEN];
+int ranks[MMAXLEN];
+
+int main(void){
+    scanf("%d%d", &np, &ng);
+    for(int i = 0; i < np; i++)
+        scanf("%d", &weight[i]);
+    for(int i = 0; i < np; i++)
+        scanf("%d", &order[i]);
+
+    //int maxRank = calcMaxRank(np);
+    //printf("%d", maxRank);
+    vector<int> curOrder(order, order + np);
+    int round = 0;
+    while(curOrder.size() > 1){
+        //cout<<"Round "<<++round<<endl;
+        vector<int> tmp = curOrder;
+        curOrder.clear();
+        for(int i = 0; i < tmp.size(); i++){
+            int maxPPos = tmp[i], maxP = weight[tmp[i]], j, maxTmpPos = i;
+            for(j = i; j - i < ng && j < tmp.size(); j++){
+                //printf("%d(w:%d) ", tmp[j], weight[tmp[j]]);
+                if(weight[tmp[j]] > maxP){
+                    maxPPos = tmp[j];
+                    maxP = weight[tmp[j]];
+                    maxTmpPos = j;
+                }
+            }
+            //printf("==> %d(w:%d)\n", maxPPos, weight[maxPPos]);
+            curOrder.push_back(maxPPos);
+            tmp[maxTmpPos] = -1;
+            i = j - 1;
+        }
+
+        for(int i = 0; i < tmp.size(); i++){
+            if(tmp[i] == -1)
+                continue;
+
+            ranks[tmp[i]] = curOrder.size() + 1;
+        }
+        //system("pause");
+    }
+    ranks[curOrder[0]] = 1;
+
+    for(int i = 0; i < np - 1; i++)
+        printf("%d ", ranks[i]);
+    printf("%d", ranks[np - 1]);
+    return 0;
+}

@@ -1,0 +1,54 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100002
+
+struct person{
+    string name;
+    int age, worth;
+};
+
+int n, k;
+person people[100001];
+int main(void){
+    scanf("%d%d", &n, &k);
+    for(int i = 0; i < n; i++){
+        char str[10];
+        scanf("%s%d%d", str, &(people[i].age), &(people[i].worth));
+        people[i].name = str;
+    }
+    sort(people, people + n, [&](person a, person b){
+            if(a.worth == b.worth){
+                if(a.age == b.age){
+                    return a.name < b.name;
+                }
+                return a.age < b.age;
+            }
+            return a.worth > b.worth;
+        });
+    for(int i = 0; i < k; i++){
+        int queryNum, queryMaxAge, queryMinAge, c = 0;
+        scanf("%d%d%d", &queryNum, &queryMinAge, &queryMaxAge);
+        printf("Case #%d:\n", i + 1);
+        for(int j = 0; j < n && c < queryNum; j++){
+            if(people[j].age >= queryMinAge && people[j].age <= queryMaxAge){
+                printf("%s %d %d\n", people[j].name.c_str(), people[j].age, people[j].worth);
+                c++;
+            }
+        }
+        if(c == 0)
+            printf("None\n");
+    }
+    return 0;
+}
