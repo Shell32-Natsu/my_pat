@@ -1,0 +1,118 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100002
+
+
+/*using multiset!!!!!!!!!!*/
+
+bool intGreater(int a, int b){return a > b;}
+bool intLess(int a, int b){return a < b;}
+
+int main(void){
+    int mstack[MMAXLEN];
+    multiset<int, bool(*)(int,int)> right(intLess);
+    multiset<int, bool(*)(int,int)> left(intGreater);
+    int n, mid;
+    scanf("%d", &n);
+    int stackTop = 0;
+    for(int i = 0; i < n; i++){
+        char in[20];
+        scanf("%s", in);
+        switch(in[1]){
+        char *p;
+        int t;
+        case 'u':
+            scanf("%d", &t);
+            mstack[stackTop++] = t;
+            if(stackTop == 1)
+                mid = t;
+            else if(right.size() == left.size()){
+                if(t >= mid){
+                    right.insert(t);
+                }
+                else{
+                    right.insert(mid);
+                    left.insert(t);
+                    mid = *left.begin();
+                    left.erase(left.begin());
+                }
+            }
+            else{
+                if(t >= mid){
+                    right.insert(t);
+                    left.insert(mid);
+                    mid = *right.begin();
+                    right.erase(right.begin());
+                }
+                else{
+                    left.insert(t);
+                }
+            }
+            break;
+
+        case 'o':
+            if(stackTop == 0){
+                printf("Invalid\n");
+            }
+            else{
+                int popNum = mstack[stackTop - 1];
+                printf("%d\n", mstack[--stackTop]);
+                if(right.size() == left.size() && left.size() != 0){
+                    if(popNum == mid){
+                        mid = *(left.begin());
+                        left.erase(left.begin());
+                    }
+                    else if(popNum > mid){
+                        right.erase(right.find(popNum));
+                        right.insert(mid);
+                        mid = *(left.begin());
+                        left.erase(left.begin());
+                    }
+                    else{
+                        left.erase(left.find(popNum));
+                    }
+                }
+                else if(right.size() == left.size() + 1){
+                    if(popNum == mid){
+                        mid = *right.begin();
+                        right.erase(right.begin());
+                    }
+                    else if(popNum > mid){
+                        right.erase(right.find(popNum));
+                    }
+                    else{
+                        left.erase(left.find(popNum));
+                        left.insert(mid);
+                        mid = *right.begin();
+                        right.erase(right.begin());
+                    }
+                }
+
+            }
+            break;
+
+        case 'e':
+            if(stackTop == 0){
+                printf("Invalid\n");
+            }
+            else{
+                printf("%d\n", mid);
+            }
+            break;
+        }
+    }
+    return 0;
+}

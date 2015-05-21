@@ -1,0 +1,28 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100002
+
+int main(void){
+    long long a, b;
+    long long a1, a2, a3, b1, b2, b3;
+    scanf("%lld.%lld.%lld%lld.%lld.%lld", &a1, &a2, &a3, &b1, &b2, &b3);
+    a = a1 * 29 * 17 + a2 * 29 + a3;
+    b = b1 * 29 * 17 + b2 * 29 + b3;
+    //cout<<a<<endl;
+    a += b;
+    printf("%lld.%lld.%lld", a / (29 * 17), (a % (29 * 17)) / 29, a % 29);
+    return 0;
+}
