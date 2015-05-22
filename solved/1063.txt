@@ -1,0 +1,67 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100002
+
+set<int> sets[50];
+int n;
+double rets[50][50];
+int retsFlag[50][50];
+
+int main(void){
+    scanf("%d", &n);
+    for(int i = 0; i < n; i++){
+        int m, t;
+        scanf("%d", &m);
+        for(int j = 0; j < m; j++){
+            scanf("%d", &t);
+            sets[i].insert(t);
+        }
+    }
+
+    int queryNum;
+    scanf("%d", &queryNum);
+    map<int, map<int, int> > setPair;
+    for(int i = 0; i < queryNum; i++){
+        int a, b;
+        scanf("%d%d", &a, &b);
+        a--, b--;
+        if(retsFlag[a][b]){
+            printf("%.1f%%\n", rets[a][b] * 100);
+            continue;
+        }
+        else if(retsFlag[b][a]){
+            printf("%.1f%%\n", rets[b][a] * 100);
+            continue;
+        }
+        set<int> t = sets[a];
+        int num = 0;
+
+        for(auto j : sets[b]){
+            if(t.find(j) != t.end()){
+                num++;
+            }
+            else{
+                t.insert(j);
+            }
+        }
+
+        rets[a][b] = rets[b][a] = (double)num / t.size();
+        retsFlag[a][b] = retsFlag[b][a] = 1;
+
+        printf("%.1f%%\n", (double)num / t.size() * 100);
+    }
+    return 0;
+}

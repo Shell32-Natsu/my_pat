@@ -1,0 +1,66 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100002
+
+struct person{
+    char id[10];
+    int talent, virtue, total, level;
+};
+
+person people[MMAXLEN];
+
+int main(void){
+    int n, l, h;
+    scanf("%d%d%d", &n, &l, &h);
+    int peopleNum = 0;
+    for(int i = 0; i < n; i++){
+        scanf("%s%d%d", people[peopleNum].id, &people[peopleNum].virtue, &people[peopleNum].talent);
+        if(people[peopleNum].talent >= l && people[peopleNum].virtue >= l){
+            people[peopleNum].total = people[peopleNum].virtue + people[peopleNum].talent;
+            if(people[peopleNum].virtue >= h && people[peopleNum].talent >= h)
+                people[peopleNum].level = 3;
+            else if(people[peopleNum].virtue >= h){
+                people[peopleNum].level = 2;
+            }
+            else if(people[peopleNum].virtue < h && people[peopleNum].talent < h && people[peopleNum].virtue >= people[peopleNum].talent){
+                people[peopleNum].level = 1;
+            }
+            else
+                people[peopleNum].level = 0;
+            peopleNum++;
+        }
+    }
+
+    printf("%d\n", peopleNum);
+    sort(people, people + peopleNum, [&](person a, person b){
+            if(a.level == b.level){
+                if(a.total == b.total){
+                    if(a.virtue == b.virtue){
+                        int t = strcmp(a.id, b.id);
+                        return t < 0;
+                    }
+                    return a.virtue > b.virtue;
+                }
+                return a.total > b.total;
+            }
+            return a.level > b.level;
+        });
+
+    for(int i = 0; i < peopleNum; i++){
+        printf("%s %d %d\n", people[i].id, people[i].virtue, people[i].talent);
+    }
+    return 0;
+}

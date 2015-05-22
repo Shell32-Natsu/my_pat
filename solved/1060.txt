@@ -1,0 +1,122 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100002
+
+bool isZero(string a){
+    for(int i = 0; i < a.length(); i++){
+        if(a[i] != '0' && a[i] != '.')
+            return false;
+    }
+    return true;
+}
+
+int main(void){
+    string a, b;
+    int digitNum, lena = 0, lenb = 0;
+    cin>>digitNum>>a>>b;
+    if(isZero(a)){
+        lena = 0;
+        a = string("0.");
+        for(int i = 0; i < digitNum; i++)
+            a.push_back('0');
+    }
+    else if(a[0] == '0' && a[1] == '.'){
+T1:     int i;
+        for(i = 2; i < a.length() && a[i] == '0'; i++);
+        lena = -(i - 2);
+        a.erase(2, i - 2);
+        a = a.substr(0, digitNum + 2);
+        if(a.length() < digitNum + 2){
+            while(a.length() < digitNum + 2)
+                a.push_back('0');
+        }
+    }
+    else{
+        while(a[0] == '0')
+            a.erase(0, 1);
+        if(a[0] == '.'){
+            a.insert(a.begin(), '0');
+            goto T1;
+        }
+        for(; lena < a.length() && a[lena] != '.'; lena++);
+        if(lena == a.length()){
+            a = string("0.") + a;
+        }
+        else{
+            a.erase(lena, 1);
+            a = string("0.") + a;
+        }
+        a = a.substr(0, digitNum + 2);
+        if(a.length() < digitNum + 2){
+            while(a.length() < digitNum + 2)
+                a.push_back('0');
+        }
+    }
+
+    if(isZero(b)){
+        lenb = 0;
+        b = string("0.");
+        for(int i = 0; i < digitNum; i++)
+            b.push_back('0');
+    }
+    else if(b[0] == '0' && b[1] =='.'){
+T2:     int i;
+        for(i = 2; i < b.length() && b[i] == '0'; i++);
+        lenb = -(i - 2);
+        b.erase(2, i - 2);
+        b = b.substr(0, digitNum + 2);
+        if(b.length() < digitNum + 2){
+            while(b.length() < digitNum + 2)
+                b.push_back('0');
+        }
+    }
+    else{
+        while(b[0] == '0')
+            b.erase(0, 1);
+        if(b[0] == '.'){
+            b.insert(b.begin(), '0');
+            goto T2;
+        }
+        for(; lenb < b.length() && b[lenb] != '.'; lenb++);
+        if(lenb == b.length()){
+            b = string("0.") + b;
+        }
+        else{
+            b.erase(lenb, 1);
+            b = string("0.") + b;
+        }
+        b = b.substr(0, digitNum + 2);
+        if(b.length() < digitNum + 2){
+            while(b.length() < digitNum + 2)
+                b.push_back('0');
+        }
+    }
+
+    if(digitNum == 0){
+        cout<<"YES 0*10^0 0*10^0";
+    }
+    else if(a == b && lena == lenb){
+        cout<<"YES"<<' '<<a;
+        cout<<"*10^"<<lena;
+    }
+    else{
+        cout<<"NO"<<' '<<a;
+        cout<<"*10^"<<lena;
+        cout<<' '<<b;
+        cout<<"*10^"<<lenb;
+    }
+    return 0;
+}
