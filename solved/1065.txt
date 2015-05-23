@@ -1,0 +1,56 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 1002
+
+int main(void){
+    /*double tt = 9223372036854775808;
+    printf("%.0f", tt);*/
+    long long a, b, c;
+    int n;
+    bool greaterFlag = false;
+    scanf("%d", &n);
+    for(int i = 0; i < n; i++){
+        char t1[50], t2[50], t3[50];
+        long long temp;
+        scanf("%s%s%s", t1, t2, t3);
+        int af, bf, cf;
+        if((af = strcmp(t1, "9223372036854775808")) == 0 || (bf = strcmp(t2, "9223372036854775808")) == 0 || (cf = strcmp(t3, "9223372036854775808")) == 0){
+            double da = atof(t1), db = atof(t2), dc = atof(t3);
+            greaterFlag = da + db > dc;
+            goto F1;
+        }
+
+        a = atoll(t1), b = atoll(t2), c = atoll(t3);
+        temp = a + b;
+        if(a > 0 && b > 0){
+            if(temp <= 0)
+                greaterFlag = true;
+            else
+                greaterFlag = temp > c;
+        }
+        else if(a < 0 && b < 0){
+            if(temp >= 0)
+                greaterFlag = false;
+            else
+                greaterFlag = temp > c;
+        }
+        else{
+            greaterFlag = temp > c;
+        }
+F1:     cout<<"Case #"<<i + 1<<": "<<(greaterFlag ? "true" : "false")<<endl;
+    }
+    return 0;
+}
