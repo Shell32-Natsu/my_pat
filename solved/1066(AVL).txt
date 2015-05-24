@@ -1,0 +1,271 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 1002
+
+struct treeNode{
+    treeNode *leftChild = NULL, *rightChild = NULL;
+    int val, depth = 0;
+    int leftHeight = 0, rightHeight = 0, height = 1;
+    treeNode *parent = NULL;
+};
+
+struct tree{
+    treeNode *root = NULL;
+    void Insert(int val);
+    treeNode* findInsertPos(int val);
+    void updateHeight(treeNode *p);
+    void printTree(treeNode *node);
+    treeNode* recoverBalance(treeNode *p);
+    bool isBalanced(treeNode *p);
+    treeNode* findNotBalanceNode(void);
+    treeNode* LL(treeNode *notNode);
+    treeNode* RR(treeNode *notNode);
+    treeNode* LR(treeNode *notNode);
+    treeNode* RL(treeNode *notNode);
+    void updateNodeHeight(treeNode *node);
+};
+
+void tree::updateNodeHeight(treeNode *node)
+{
+    if(node == NULL)
+        return;
+    if(node->leftChild){
+        node->leftChild->height = node->height - 1;
+        node->leftHeight = node->leftChild->height;
+        updateNodeHeight(node->leftChild);
+    }
+    else{
+        node->leftHeight = 0;
+    }
+
+    if(node->rightChild){
+        node->rightChild->height = node->height - 1;
+        node->rightHeight = node->rightChild->height;
+        updateNodeHeight(node->rightChild);
+    }
+    else{
+        node->rightHeight = 0;
+    }
+
+}
+
+treeNode* tree::LL(treeNode *notNode)
+{
+    treeNode *left = notNode->leftChild;
+    notNode->leftChild = left->rightChild;
+    if(notNode->parent == NULL){
+        root = left;
+        left->parent = NULL;
+        notNode->parent = left;
+        notNode->leftChild = left->rightChild;
+        if(notNode->leftChild)notNode->leftChild->parent = notNode;
+        left->rightChild = notNode;
+    }
+    else{
+        if(notNode->parent->leftChild == notNode){
+            notNode->parent->leftChild = left;
+            left->parent = notNode->parent;
+            notNode->parent = left;
+            notNode->leftChild = left->rightChild;
+            if(notNode->leftChild)notNode->leftChild->parent = notNode;
+            left->rightChild = notNode;
+        }
+        else{
+            notNode->parent->rightChild = left;
+            left->parent = notNode->parent;
+            notNode->parent = left;
+            notNode->leftChild = left->rightChild;
+            if(notNode->leftChild)notNode->leftChild->parent = notNode;
+            left->rightChild = notNode;
+        }
+    }
+    return left;
+}
+
+treeNode* tree::RR(treeNode *notNode)
+{
+    treeNode *right = notNode->rightChild;
+    notNode->rightChild = right->leftChild;
+    if(notNode->parent == NULL){
+        root = right;
+        right->parent = NULL;
+        notNode->parent = right;
+        notNode->rightChild = right->leftChild;
+        right->leftChild = notNode;
+        if(notNode->rightChild)notNode->rightChild->parent = notNode;
+    }
+    else{
+        if(notNode->parent->leftChild == notNode){
+            notNode->parent->leftChild = right;
+            right->parent = notNode->parent;
+            notNode->parent = right;
+            notNode->rightChild = right->leftChild;
+            right->leftChild = notNode;
+            if(notNode->rightChild)notNode->rightChild->parent = notNode;
+        }
+        else{
+            notNode->parent->rightChild = right;
+            right->parent = notNode->parent;
+            notNode->parent = right;
+            notNode->rightChild = right->leftChild;
+            right->leftChild = notNode;
+            if(notNode->rightChild)notNode->rightChild->parent = notNode;
+        }
+    }
+    return right;
+}
+
+treeNode* tree::RL(treeNode *notNode)
+{
+    treeNode *right1 = notNode->rightChild;
+    LL(right1);
+    return RR(notNode);
+}
+
+treeNode* tree::LR(treeNode *notNode)
+{
+    treeNode *left1 = notNode->leftChild;
+    RR(left1);
+    return LL(notNode);
+}
+
+treeNode* tree::findNotBalanceNode(void)
+{
+    treeNode *p = root;
+    while(p && (!isBalanced(p->rightChild) || !isBalanced(p->leftChild))){
+        if(!isBalanced(p->leftChild))
+            p = p->leftChild;
+        else
+            p = p->rightChild;
+    }
+    return p;
+}
+
+bool tree::isBalanced(treeNode *p)
+{
+    if(p == NULL)
+        return true;
+    int t = p->leftHeight - p->rightHeight;
+    return (t == -1 || t == 1 || t == 0) && isBalanced(p->leftChild) && isBalanced(p->rightChild);
+}
+
+treeNode* tree::recoverBalance(treeNode *p)
+{
+    if(isBalanced(root))
+        return root;
+    //cout<<endl<<"In inserting "<<p->val<<" lost balance."<<endl;
+    treeNode *notNode = findNotBalanceNode();
+    int oldHeight = notNode->height;
+    //cout<<"第一个失去平衡节点为:"<<notNode->val<<endl;
+    treeNode *insertNode = p;
+    int insertChildTree1 = notNode->leftHeight > notNode->rightHeight ? 0 : 1;
+    treeNode *insertTree = notNode->leftHeight > notNode->rightHeight ? notNode->leftChild : notNode->rightChild;
+    int insertChildTree2 = insertTree->leftHeight > insertTree->rightHeight ? 0 : 1;
+    treeNode *ret;
+    if(!insertChildTree1 && !insertChildTree2){
+        ret = LL(notNode);
+        //cout<<"LL"<<endl;
+    }
+    if(insertChildTree1 && insertChildTree2){
+        ret = RR(notNode);
+        //cout<<"RR"<<endl;
+    }
+    if(!insertChildTree1 && insertChildTree2){
+        ret = LR(notNode);
+        //cout<<"LR"<<endl;
+    }
+    if(insertChildTree1 && !insertChildTree2){
+        ret = RL(notNode);
+        //cout<<"RL"<<endl;
+    }
+    //cout<<"旋转后根节点为:"<<ret->val<<endl;
+    ret->height = oldHeight - 1;
+    updateHeight(ret);
+    updateNodeHeight(ret);
+}
+
+void tree::printTree(treeNode *node)
+{
+    if(node == NULL)
+        return ;
+    printf("addr=0x%x, val=%d, depth=%d, height=%d, parent=0x%x\n\tleftChild=0x%x, leftHeight=%d\n\trightChild=0x%x, rightHeight=%d\n",
+           node, node->val, node->depth, node->height, node->parent, node->leftChild, node->leftHeight, node->rightChild, node->rightHeight);
+    printTree(node->leftChild);
+    printTree(node->rightChild);
+}
+
+void tree::updateHeight(treeNode *p)
+{
+    if(p->parent == NULL)
+        return;
+    treeNode *parent = p->parent;
+    if(parent->leftChild == p)
+        parent->leftHeight = p->height;
+    else
+        parent->rightHeight = p->height;
+    parent->height = max(parent->leftHeight, parent->rightHeight) + 1;
+    updateHeight(parent);
+}
+
+void tree::Insert(int val)
+{
+    treeNode *insertPos = findInsertPos(val);
+    if(insertPos == NULL){
+        treeNode *insertNode = new treeNode;
+        insertNode->val = val;
+        root = insertNode;
+        return;
+    }
+    treeNode *insertNode = new treeNode;
+    insertNode->val = val, insertNode->parent = insertPos, insertNode->depth = insertPos->depth + 1;
+    if(val >= insertPos->val)
+        insertPos->rightChild = insertNode;
+    else
+        insertPos->leftChild = insertNode;
+    updateHeight(insertNode);
+    treeNode* tRoot = recoverBalance(insertNode);
+}
+
+treeNode* tree::findInsertPos(int val)
+{
+    treeNode *p = root, *ret = root;
+    while(p != NULL){
+        if(val >= p->val){
+            ret = p;
+            p = p->rightChild;
+        }
+        else{
+            ret = p;
+            p = p->leftChild;
+        }
+    }
+    return ret;
+}
+
+int main(void){
+    int n;
+    scanf("%d", &n);
+    tree Tree;
+    int t;
+    for(int i = 0; i < n; i++){
+        scanf("%d", &t);
+        Tree.Insert(t);
+        /*cout<<endl<<"Inserting :"<<t<<endl;
+        Tree.printTree(Tree.root);*/
+    }
+    printf("%d", Tree.root->val);
+    return 0;
+}
