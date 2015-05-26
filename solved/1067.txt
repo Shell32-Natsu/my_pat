@@ -1,0 +1,56 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100002
+/*使用了类似有向图的方法，计算连通分支。注意本来就有序和0本来就在位置0的情况*/
+
+struct node{
+    int val;
+    int pos;
+    int next = -1;
+    bool hasChecked = false;
+};
+int n;
+map<int, node> arr;
+
+int main(void){
+    scanf("%d", &n);
+    int zeroPos;
+    for(int i = 0; i < n; i++){
+        int val;
+        scanf("%d", &val);
+        arr[val].val = val, arr[val].pos = i;
+    }
+    int graphNum = 0, itemNum = 0;
+    for(auto i = arr.begin(); i != arr.end(); i++){
+        if(i->second.hasChecked || i->second.pos == i->second.val)
+            continue;
+        graphNum++;
+        int next = i->second.val;
+        while(!arr[next].hasChecked){
+            arr[next].hasChecked = true;
+            next = arr[next].pos;
+            itemNum++;
+        }
+    }
+    int ret = itemNum - 1 + graphNum - 1;
+    if(arr[0].pos == 0)
+        ret+=2;
+    if(itemNum == 0)
+        ret = 0;
+
+    printf("%d", ret);
+    return 0;
+}

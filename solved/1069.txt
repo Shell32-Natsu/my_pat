@@ -1,0 +1,81 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 10002
+char num[4], reserveNum[4];
+void printNum(char *num)
+{
+    printf("%c%c%c%c", num[0], num[1], num[2], num[3]);
+}
+
+void minusNum(char *a, char *b)
+{
+    int aa = a[0] * 1000 + a[1] * 100 + a[2] * 10 + a[3];
+    int bb = b[0] * 1000 + b[1] * 100 + b[2] * 10 + b[3];
+    int i = 3, n = aa - bb;
+    while(n > 0){
+        a[i--] = n % 10 + '0';
+        n /= 10;
+    }
+    while(i >= 0)
+        a[i--] = '0';
+}
+
+int main(void){
+    int n, i = 3;
+    scanf("%d", &n);
+    while(n > 0){
+        num[i--] = n % 10 + '0';
+        n /= 10;
+    }
+    while(i >= 0)
+        num[i--] = '0';
+
+    if(num[0] == '6' && num[1] == '1' && num[2] == '7' && num[3] == '4'){
+        sort(num, num + 4, greater<int>());
+        memcpy(reserveNum, num, sizeof(num));
+        reverse(reserveNum, reserveNum + 4);
+        printNum(num);
+        printf(" - ");
+        printNum(reserveNum);
+        printf(" = ");
+        minusNum(num, reserveNum);
+        printNum(num);
+    }
+    else if(num[0] == num[1] && num[1] == num[2] && num[2] == num[3]){
+        printNum(num);
+        printf(" - ");
+        printNum(num);
+        printf(" = 0000");
+    }
+    else{
+        while(!(num[0] == '6' && num[1] == '1' && num[2] == '7' && num[3] == '4')){
+            sort(num, num + 4, greater<int>());
+            memcpy(reserveNum, num, sizeof(num));
+            reverse(reserveNum, reserveNum + 4);
+            printNum(num);
+            printf(" - ");
+            printNum(reserveNum);
+            printf(" = ");
+            minusNum(num, reserveNum);
+            printNum(num);
+            printf("\n");
+        }
+    }
+
+
+    //printf("%c%c%c%c", reserveNum[0], reserveNum[1], reserveNum[2], reserveNum[3]);
+    return 0;
+}
