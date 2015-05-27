@@ -1,0 +1,138 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 1020
+struct nextListNode{
+    int next, len;
+};
+
+enum type{
+    GAS,HOUSE
+};
+
+struct gNode{
+    int val;
+    type nodeType = HOUSE;
+    double avgDis;
+    int minDis, shortestLen = INT_MAX, maxDis;
+    bool isChecked = false;
+    vector<nextListNode> nextList;
+};
+
+gNode GG[MMAXLEN], GGTemp[MMAXLEN];
+int n, m, k, ds, pointNum;
+vector<int> gasPos;
+
+int findShortest(void)
+{
+    int minPos = 1, minLen = INT_MAX;
+    for(int i = 1; i <= pointNum; i++){
+        if(GG[i].isChecked)
+            continue;
+        if(GG[i].shortestLen < minLen){
+            minLen = GG[i].shortestLen;
+            minPos = i;
+        }
+    }
+    return minPos;
+}
+
+void dijkstra(int pos)
+{
+    GG[pos].shortestLen = 0;
+    vector<int> shortestLen;
+    while(shortestLen.size() < n){
+        int t = findShortest();
+        GG[t].isChecked = true;
+        if(t <= n) shortestLen.push_back(GG[t].shortestLen);
+        for(auto i : GG[t].nextList){
+            if(GG[i.next].shortestLen > GG[t].shortestLen + i.len)
+                GG[i.next].shortestLen = GG[t].shortestLen + i.len;
+        }
+    }
+
+    if(shortestLen.empty()){
+        GG[pos].maxDis = INT_MAX;
+    }
+    else{
+        GG[pos].minDis = shortestLen[0];
+        GG[pos].maxDis = *(shortestLen.end() - 1);
+        int sum = 0;
+        for(auto i : shortestLen)
+            sum += i;
+        GG[pos].avgDis = (double)sum / shortestLen.size();
+    }
+    for(int i = 1; i <= pointNum; i++){
+        GG[i].isChecked = false;
+        GG[i].shortestLen = INT_MAX;
+    }
+}
+
+int main(void)
+{
+    scanf("%d%d%d%d", &n, &m,&k, &ds);
+    for(int i = 0; i < k; i++){
+        char *t1 = new char[10], *t2 = new char[10];
+        int length, pos1, pos2;
+        type type1 = HOUSE, type2 = HOUSE;
+        scanf("%s%s%d", t1, t2, &length);
+        if(t1[0] == 'G')
+            t1++, type1 = GAS;
+        if(type1 == HOUSE) pos1 = atoi(t1);
+        else pos1 = atoi(t1) + n;
+
+        if(t2[0] == 'G')
+            t2++, type2 = GAS;
+        if(type2 == HOUSE) pos2 = atoi(t2);
+        else pos2 = atoi(t2) + n;
+
+        nextListNode tmp;
+        tmp.next = pos2, tmp.len = length;
+        GG[pos1].nextList.push_back(tmp);
+        tmp.next = pos1;
+        GG[pos2].nextList.push_back(tmp);
+    }
+    for(int i = n + 1; i <= n + m; i++)
+        GG[i].nodeType = GAS;
+
+    pointNum = n + m;
+    for(int i = n + 1; i <= pointNum; i++)
+        dijkstra(i);
+
+    int maxDis = 0, pos = -1;
+    double minAvgDis = (double)INT_MAX;
+    for(int i = n + 1; i <= pointNum; i++){
+        if(GG[i].maxDis > ds)
+            continue;
+        if(GG[i].minDis == maxDis){
+            if(minAvgDis > GG[i].avgDis){
+                maxDis = GG[i].minDis;
+                minAvgDis = GG[i].avgDis;
+                pos = i;
+            }
+        }
+        else if(GG[i].minDis > maxDis){
+            maxDis = GG[i].minDis;
+            minAvgDis = GG[i].avgDis;
+            pos = i;
+        }
+    }
+
+    if(pos != -1)
+        printf("G%d\n%.1f %.1f", pos - n,(double)maxDis, (double)((int)(minAvgDis * 10 + 0.5) / 10.0));
+    else
+        printf("No Solution");
+    return 0;
+}

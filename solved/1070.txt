@@ -1,0 +1,53 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 1002
+struct item{
+    double amount;
+    double price, weight;
+} arr[MMAXLEN];
+
+
+int main(void)
+{
+    int n;
+    double d;
+    scanf("%d%lg", &n, &d);
+    for(int i = 0; i < n; i++)
+        scanf("%lg", &arr[i].amount);
+    for(int i = 0; i < n; i++){
+        scanf("%lg", &arr[i].price);
+        arr[i].weight = arr[i].price / arr[i].amount;
+    }
+
+    sort(arr, arr + n, [&](item a, item b){
+            return a.weight > b.weight;
+        });
+
+    double ret = 0;
+    for(int i = 0; i < n; i++){
+        if(d >= arr[i].amount){
+            d -= arr[i].amount;
+            ret += arr[i].price;
+        }
+        else{
+            ret += arr[i].price * ((double)d / arr[i].amount);
+            break;
+        }
+    }
+
+    printf("%.2f", ret);
+    return 0;
+}

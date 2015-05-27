@@ -1,0 +1,59 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 1002
+char line[1024 * 1024 + 1];
+map<string, int> ret;
+inline bool isValid(char *p)
+{
+    return (*p >= '0' && *p <= '9') || (*p >= 'a' && *p <= 'z') || (*p >= 'A' && *p <= 'Z');
+}
+
+int main(void)
+{
+    gets(line);
+    char *p1 = line, *p2 = line;
+    int len = strlen(line);
+    while(p1 - line < len && p2 - line < len){
+        for(; isValid(p2); p2++);
+        *p2 = 0;
+
+        for(char *t = p1; t != p2; t++)
+            *t = tolower(*t);
+
+        if(ret.find(p1) == ret.end()){
+            ret[p1] = 1;
+        }
+        else{
+            ret[p1]++;
+        }
+        //printf("%s\n", p1);
+
+        p1 = p2;
+        for(; !isValid(p1) && p1 - line < len; p1++);
+        p2 = p1;
+    }
+
+    int maxT = 0;
+    string maxStr;
+    for(auto i = ret.begin(); i != ret.end(); i++){
+        if(i->second > maxT){
+            maxT = i->second;
+            maxStr = i->first;
+        }
+    }
+    printf("%s %d", maxStr.c_str(), maxT);
+    return 0;
+}
