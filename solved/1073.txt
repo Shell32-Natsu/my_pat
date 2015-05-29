@@ -1,0 +1,60 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 20050
+char str[MMAXLEN];
+char ret[MMAXLEN];
+
+int main(void)
+{
+    scanf("%s", str);
+    char *retp = ret;
+    if(str[0] == '-')
+        *(retp++) = '-';
+    char *p = str;
+    while(*p != 'E')
+        p++;
+    int exponent = atoi(p + 1);
+    //printf("%d", exponent);
+    if(exponent >= 0){
+        for(p = str + 1; *p != 'E'; p++){
+            *(retp++) = *p;
+        }
+        for(p = ret; *p != '.'; p++);
+        for(int i = 0; i < exponent; i++){
+            if(*(p + 1) == 0)
+                *p = '0';
+            else
+                *p = *(p + 1);
+            *(++p) = '.';
+        }
+        if(*(p + 1) == 0)
+            *p = 0;
+    }
+    else{
+        exponent = -exponent;
+        *(retp++) = '0';
+        *(retp++) = '.';
+        for(int i = 0; i < exponent - 1; i++)
+            *(retp++) = '0';
+        for(p = str + 1; *p != 'E'; p++){
+            if(*p == '.')
+                continue;
+            *(retp++) = *p;
+        }
+    }
+    printf("%s", ret);
+    return 0;
+}
