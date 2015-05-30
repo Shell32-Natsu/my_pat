@@ -1,0 +1,92 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 10010
+struct user{
+    int id = INT_MAX, totalScore = 0, submitNum = 0;
+    int score[6] = {-1, -1, -1, -1, -1, -1};
+};
+
+user users[MMAXLEN];
+int perfectScore[6];
+int n, k, m;
+
+int main(void)
+{
+    scanf("%d%d%d", &n, &k, &m);
+    for(int i = 0; i < k; i++){
+        scanf("%d", perfectScore + i + 1);
+    }
+
+    int id, problem, score;
+    for(int i = 0; i < m; i++){
+        scanf("%d%d%d", &id, &problem, &score);
+        if(score == -1)
+            score = 0;
+        else
+            users[id].submitNum++;
+        if(users[id].id == INT_MAX)
+            users[id].id = id;
+        if(users[id].score[problem] < score){
+            if(users[id].score[problem] != -1){
+                users[id].totalScore -= users[id].score[problem];
+            }
+            users[id].score[problem] = score;
+            users[id].totalScore += score;
+        }
+    }
+
+    sort(users + 1, users + n + 1, [&](user a, user b){
+            if(a.totalScore == b.totalScore){
+                int aN = 0, bN = 0;
+                for(int i = 1; i <= k; i++){
+                    if(a.score[i] == perfectScore[i])
+                        aN++;
+                    if(b.score[i] == perfectScore[i])
+                        bN++;
+                }
+                if(aN == bN){
+                    if((!a.submitNum && !b.submitNum) || (a.submitNum && b.submitNum))
+                        return a.id < b.id;
+                    if(a.submitNum)
+                        return true;
+                    if(b.submitNum)
+                        return false;
+                }
+                return aN > bN;
+            }
+            return a.totalScore > b.totalScore;
+        });
+
+    int r = 1, tmp = 0;
+    for(int i = 1; i <= n; i++){
+        if(users[i].id == INT_MAX || !users[i].submitNum){
+            break;
+        }
+        if(i > 0 && users[i].totalScore != users[i - 1].totalScore)
+            r = i;
+        printf("%d %05d %d ", r, users[i].id, users[i].totalScore);
+        for(int j = 1; j < k; j++)
+            if(users[i].score[j] == -1)
+                printf("- ");
+            else
+                printf("%d ", users[i].score[j]);
+        if(users[i].score[k] == -1)
+            puts("-");
+        else
+            printf("%d\n", users[i].score[k]);
+    }
+    return 0;
+}

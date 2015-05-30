@@ -1,0 +1,77 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 1001
+struct gNode{
+    int id, num = -1;
+    vector<int> nextList;
+};
+
+gNode gg[MMAXLEN];
+bool visited[MMAXLEN];
+int level[MMAXLEN];
+int n, l;
+
+int getAnswer(int q)
+{
+    if(gg[q].num != -1)
+        return gg[q].num;
+    memset(visited, 0, sizeof(visited));
+    set<int> ret;
+    queue<int> bfs;
+    bfs.push(q);
+    visited[q] = true;
+    level[q] = 0;
+    while(!bfs.empty()){
+        int t = bfs.front();
+        if(level[t] >= l)
+            break;
+        bfs.pop();
+        for(auto i = gg[t].nextList.begin(); i != gg[t].nextList.end(); i++){
+            if(!visited[*i] && ret.find(*i) == ret.end()){
+                bfs.push(*i);
+                ret.insert(*i);
+                visited[*i] = true;
+                level[*i] = level[t] + 1;
+            }
+        }
+    }
+
+    gg[q].num = ret.size();
+    return gg[q].num;
+}
+
+int main(void)
+{
+    scanf("%d%d", &n, &l);
+    for(int i = 0; i < n; i++){
+        int t;
+        scanf("%d", &t);
+        for(int j = 0; j < t; j++){
+            int tt;
+            scanf("%d", &tt);
+            gg[tt].nextList.push_back(i + 1);
+        }
+    }
+    int m;
+    scanf("%d", &m);
+
+    for(int i = 0; i < m; i++){
+        int q;
+        scanf("%d", &q);
+        printf("%d\n", getAnswer(q));
+    }
+    return 0;
+}
