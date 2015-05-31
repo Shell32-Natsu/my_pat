@@ -1,0 +1,72 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 20000
+
+int MSize, TSize, n;
+bool occupied[MMAXLEN];
+bool isPrime(int n)
+{
+    if(n == 1)
+        return false;
+    for(int i = 2; i * i <= n; i++)
+        if(n % i == 0)
+            return false;
+    return true;
+}
+
+int insertHash(int t)
+{
+    if(!occupied[t % TSize]){
+        occupied[t % TSize] = true;
+        return t % TSize;
+    }
+    else{
+        int j = 1, pos = (t + j * j) % TSize;
+        while(j < TSize){
+            if(!occupied[pos]){
+                occupied[pos] = true;
+                return pos;
+            }
+            j++;
+            pos = (t + j * j) % TSize;
+        }
+        return -1;
+    }
+}
+
+int main(void)
+{
+    scanf("%d%d", &MSize, &n);
+    for(TSize = MSize; !isPrime(TSize); TSize++);
+    for(int i = 0; i < n; i++){
+        int t;
+        scanf("%d", &t);
+        int ret = insertHash(t);
+        if(i == n - 1){
+            if(ret == -1)
+                printf("-");
+            else
+                printf("%d", ret);
+        }
+        else{
+            if(ret == -1)
+                printf("- ");
+            else
+                printf("%d ", ret);
+        }
+    }
+    return 0;
+}
