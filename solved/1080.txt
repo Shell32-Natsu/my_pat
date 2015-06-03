@@ -1,0 +1,98 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100001
+struct stu{
+    int choices[10];
+    int ge, gi;
+    double score;
+    int pos;
+};
+
+struct school{
+    int num;
+    set<int> admit;
+    int lastAdmit;
+};
+
+stu application[50001], appl[50001];
+school schools[201];
+int n, m, k;
+
+bool isEqualDouble(double a, double b)
+{
+    double t = a - b;
+    if(t < 0.00000001 && t > -0.00000001)
+        return true;
+    return false;
+}
+
+int main(void)
+{
+    scanf("%d%d%d", &n, &m, &k);
+    for(int i = 0; i < m; i++){
+        scanf("%d", &(schools[i].num));
+    }
+    for(int i = 0; i < n; i++){
+        scanf("%d%d", &(application[i].ge), &(application[i].gi));
+        application[i].score = ((double)application[i].ge + (double)application[i].gi) / 2;
+        application[i].pos = i;
+        for(int j = 0; j < k; j++)
+            scanf("%d", &(application[i].choices[j]));
+        appl[i] = application[i];
+    }
+
+    sort(appl, appl + n, [&](stu a, stu b){
+            if(isEqualDouble(a.score, b.score)){
+                return a.ge > b.ge;
+            }
+            return a.score > b.score;
+        });
+
+    /*for(int i = 0; i < n; i++){
+        printf("pos=%d ge=%d gi=%d score=%g\n", appl[i].pos, appl[i].ge, appl[i].gi, appl[i].score);
+    }*/
+    for(int i = 0; i < n; i++){
+        for(int j = 0; j < k; j++){
+            int zy = appl[i].choices[j];
+            if(schools[zy].admit.size() < schools[zy].num){
+                schools[zy].admit.insert(appl[i].pos);
+                schools[zy].lastAdmit = i;
+                break;
+            }
+            else if(isEqualDouble(appl[schools[zy].lastAdmit].score, appl[i].score) && appl[schools[zy].lastAdmit].ge == appl[i].ge){
+                schools[zy].admit.insert(appl[i].pos);
+                break;
+            }
+        }
+    }
+
+    for(int i = 0; i < m; i++){
+        if(schools[i].admit.empty()){
+            printf("\n");
+        }
+        else{
+            char ret[1024000] = "", *p = ret;
+            for(auto j = schools[i].admit.begin(); j != schools[i].admit.end(); j++){
+                sprintf(p, "%d ", *j);
+                while(*p != 0)p++;
+            }
+            *(p - 1) = 0;
+            puts(ret);
+        }
+    }
+
+    return 0;
+}

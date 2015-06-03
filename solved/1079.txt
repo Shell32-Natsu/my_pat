@@ -1,0 +1,72 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100001
+
+struct node{
+    int parent = -1;
+    int len = 0;
+    int num = 0;
+    vector<int> next;
+};
+
+node tree[MMAXLEN];
+int n, leafNum = 0;
+double origPrice, Ratio;
+int leafNode[MMAXLEN];
+
+void getLen(void)
+{
+    queue<int> q;
+    q.push(0);
+    while(!q.empty()){
+        int tt = q.front();
+        q.pop();
+        for(auto i : tree[tt].next){
+            q.push(i);
+            tree[i].len = tree[tt].len + 1;
+        }
+    }
+}
+
+int main(void)
+{
+    scanf("%d%lg%lg", &n, &origPrice, &Ratio);
+    for(int i = 0; i < n; i++){
+        int k;
+        scanf("%d", &k);
+        if(k){
+            for(int j = 0; j < k; j++){
+                int t;
+                scanf("%d", &t);
+                tree[t].parent = i;
+                tree[i].next.push_back(t);
+            }
+        }
+        else{
+            int t;
+            scanf("%d", &t);
+            tree[i].num = t;
+            leafNode[leafNum++] = i;
+        }
+    }
+    double ret = 0.0;
+    getLen();
+    for(int i = 0; i < leafNum; i++){
+        ret += origPrice * pow(1 + Ratio / 100, (double)tree[leafNode[i]].len) * (double)tree[leafNode[i]].num;
+    }
+    printf("%.1f", ret);
+    return 0;
+}

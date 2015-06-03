@@ -1,0 +1,61 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100001
+
+inline long long getGcd(long long a, long long b)
+{
+    if(a < b){
+        long long t = a;
+        a = b;
+        b = t;
+    }
+    while(a % b != 0){
+        int t = a;
+        a = b;
+        b = t % b;
+    }
+    return b;
+}
+
+int main(void)
+{
+    int n;
+    scanf("%d", &n);
+    int integer = 0;
+    long long oa = 0, ob = 1;
+    for(int i = 0; i < n; i++){
+        long long a, b;
+        scanf("%lld/%lld", &a, &b);
+        oa = oa * b + a * ob;
+        ob = ob * b;
+        long long gcd = getGcd(oa, ob);
+        oa /= gcd;
+        ob /= gcd;
+        integer += oa / ob;
+        oa = oa % ob;
+    }
+    if(integer != 0 && oa != 0)
+        printf("%d ", integer);
+    else if(integer != 0 && oa == 0)
+        printf("%d", integer);
+    else if(integer == 0 && oa == 0)
+        printf("0");
+
+    if(oa != 0)
+        printf("%lld/%lld", oa, ob);
+
+    return 0;
+}
