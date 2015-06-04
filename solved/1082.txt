@@ -1,0 +1,100 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100001
+
+char Number[10][10] = {"ling ", "yi ", "er ", "san ", "si ", "wu ", "liu ", "qi ", "ba ", "jiu "};
+map<int, string> LiangCi;
+string ret;
+
+void procFour(string a)
+{
+    int length = a.length();
+    for(int i = 0; i < length; i++){
+        if(a[i] == '0'){
+            while(a[i] == '0')
+                i++;
+            if(i != length)
+                ret += Number[0];
+            i--;
+            continue;
+        }
+        ret += Number[a[i] - '0'];
+        switch(length - i){
+            case 2:
+                ret += LiangCi[10];
+                break;
+            case 3:
+                ret += LiangCi[100];
+                break;
+            case 4:
+                ret += LiangCi[1000];
+                break;
+        }
+    }
+
+}
+
+int main(void)
+{
+    LiangCi[10] = "Shi ";
+    LiangCi[100] = "Bai ";
+    LiangCi[1000] = "Qian ";
+    LiangCi[10000] = "Wan ";
+    LiangCi[100000] = "Yi ";
+    char *in = new char[20];
+    scanf("%s", in);
+    string ge, wan, yi;
+    if(in[0] == '-'){
+        ret += "Fu ";
+        in++;
+    }
+    while(*in == '0')
+        in++;
+    if(*in == 0){
+        printf("ling");
+        return 0;
+    }
+    int inLen = strlen(in);
+    if(inLen <= 4){
+        ge = in;
+    }
+    else if(inLen <= 8){
+        ge = &in[inLen - 4];
+        in[inLen - 4] = 0;
+        wan = in;
+    }
+    else{
+        ge = &in[inLen - 4];
+        in[inLen - 4] = 0;
+        wan = &in[inLen - 8];
+        in[inLen - 8] = 0;
+        yi = in;
+    }
+
+    //cout<<yi<<endl<<wan<<endl<<ge<<endl;
+    if(!yi.empty()){
+        procFour(yi);
+        ret += "Yi ";
+    }
+    if(!wan.empty()){
+        procFour(wan);
+        ret += "Wan ";
+    }
+    procFour(ge);
+    ret[ret.length() - 1] = 0;
+    printf("%s", ret.c_str());
+    return 0;
+}
