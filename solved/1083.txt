@@ -1,0 +1,45 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100001
+struct stu{
+    string name, id;
+    int grade;
+};
+
+stu arr[105];
+int n;
+
+int main(void)
+{
+    scanf("%d", &n);
+    for(int i = 0; i < n; i++){
+        cin>>arr[i].name>>arr[i].id>>arr[i].grade;
+    }
+    sort(arr, arr + n, [&](stu a, stu b){
+            return a.grade > b.grade;
+        });
+
+    int high, low;
+    cin>>low>>high;
+    int i, flag = false;
+    for(i = 0; arr[i].grade > high; i++);
+    for(; arr[i].grade >= low; i++)
+        flag = true, cout<<arr[i].name<<' '<<arr[i].id<<endl;
+
+    if(!flag)
+        cout<<"NONE";
+    return 0;
+}

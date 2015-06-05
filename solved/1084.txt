@@ -1,0 +1,42 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100001
+
+int main(void)
+{
+    char stra[100], strb[100];
+    scanf("%s%s", stra, strb);
+    char *p1 = stra, *p2 = strb;
+    vector<char> ret;
+    while(*p1 != 0){
+        if(*p1 != *p2){
+            auto i = ret.begin();
+            for(; i != ret.end(); i++)
+                if(*i == toupper(*p1))
+                    break;
+            if(i == ret.end())
+                ret.push_back(toupper(*p1));
+            p1++;
+        }
+        else{
+            p1++;
+            p2++;
+        }
+    }
+    for(auto i : ret)
+        printf("%c", i);
+    return 0;
+}
