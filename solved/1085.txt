@@ -1,0 +1,52 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 200100
+struct numAndVal{
+    int pos;
+    long long val;
+};
+
+long long arr[MMAXLEN];
+
+int main(void)
+{
+    int n;
+    long long p;
+    scanf("%d%lld", &n, &p);
+    for(int i = 0; i < n; i++){
+        scanf("%lld", &(arr[i]));
+        //arr[i].pos = i;
+    }
+    sort(arr, arr + n);
+
+    int maxNum = 0, minPos = 0, maxPos = 0;
+    for(int j = 0; j < n; j++){
+        long long maxVal = arr[j];
+        if(maxVal <= arr[minPos] * p){
+            maxPos = j;
+            if(maxPos - minPos + 1 > maxNum)
+                maxNum = maxPos - minPos + 1;
+        }
+        else{
+            while(maxVal > arr[minPos] * p)
+                minPos++;
+            if(maxPos - minPos + 1 > maxNum)
+                maxNum = maxPos - minPos + 1;
+        }
+    }
+    printf("%d", maxNum);
+    return 0;
+}

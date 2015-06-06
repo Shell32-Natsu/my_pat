@@ -1,0 +1,81 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 31
+struct node{
+    int val, leftChild = -1, rightChild = -1;
+};
+typedef enum{PUSH, POP} procType;
+struct proc{
+    procType process;
+    int node;
+};
+
+node tree[MMAXLEN];
+proc procs[MMAXLEN * 2];
+int n, header;
+
+void printTree(int node)
+{
+    if(node == -1)
+        return ;
+    printTree(tree[node].leftChild);
+    printTree(tree[node].rightChild);
+    printf("%d", node);
+    if(node != header)
+        printf(" ");
+}
+
+int main(void)
+{
+    char tmp[10];
+    scanf("%d", &n);
+    for(int i = 0; i < n * 2; i++){
+        int in;
+        scanf("%s", tmp);
+        if(tmp[1] == 'u'){
+            scanf("%d", &in);
+            procs[i].process = PUSH;
+            procs[i].node = in;
+        }
+        else
+            procs[i].process = POP;
+    }
+    header = procs[0].node;
+    int parent = header;
+    procType lastType = PUSH;
+    vector<int> nodeStack = {header};
+    for(int i = 1; i < n * 2; i++){
+        if(procs[i].process == PUSH){
+            if(lastType == PUSH){
+                tree[parent].leftChild = procs[i].node;
+            }
+            else{
+                tree[parent].rightChild = procs[i].node;
+            }
+            parent = procs[i].node;
+            lastType = PUSH;
+            nodeStack.push_back(procs[i].node);
+        }
+        else{
+            parent = nodeStack.back();
+            nodeStack.pop_back();
+            lastType = POP;
+        }
+    }
+
+    printTree(header);
+    return 0;
+}
