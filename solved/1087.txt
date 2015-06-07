@@ -1,0 +1,148 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 202
+map<string, int> nameToNum;
+struct road{
+    int length;
+    int next;
+};
+struct gNode{
+    string name;
+    int happiness;
+    int shortestLength = INT_MAX;
+    bool isVisited = false, isShortest = false;
+    vector<road> nextList;
+};
+struct pathNode{
+    vector<string> path;
+    int totalHappiness, averageHappiness;
+};
+
+gNode gg[MMAXLEN];
+int n, k, romNum;
+string startCity;
+vector<pathNode> shortestPath;
+vector<string> tempPath;
+
+bool dijkstraEnd(void)
+{
+    for(int i = 0; i < n; i++){
+        if(gg[i].isShortest == false)
+            return false;
+    }
+    return true;
+}
+
+void dijkstra(void)
+{
+    gg[0].isShortest = true;
+    int node = 0;
+    while(!dijkstraEnd()){
+        for(auto i : gg[node].nextList){
+            if(gg[i.next].shortestLength > gg[node].shortestLength + i.length)
+                gg[i.next].shortestLength = gg[node].shortestLength + i.length;
+        }
+        int minVal = INT_MAX, minPos = -1;
+        for(int i = 0; i < n; i++){
+            if(gg[i].isShortest)
+                continue;
+            if(gg[i].shortestLength < minVal){
+                minVal = gg[i].shortestLength;
+                minPos = i;
+            }
+        }
+
+        gg[minPos].isShortest = true;
+        node = minPos;
+    }
+}
+
+void deep(int node)
+{
+    gg[node].isVisited = true;
+    tempPath.push_back(gg[node].name);
+    if(node == romNum){
+        pathNode t;
+        t.path = tempPath;
+        int num = tempPath.size(), totalHappiness = 0;
+        for(int i = 1; i < num; i++)
+            totalHappiness += gg[nameToNum[tempPath[i]]].happiness;
+        t.totalHappiness = totalHappiness;
+        t.averageHappiness = totalHappiness / (num - 1);
+        shortestPath.push_back(t);
+        tempPath.pop_back();
+        gg[node].isVisited = false;
+        return;
+    }
+    for(auto i : gg[node].nextList){
+        if( !gg[i.next].isVisited && gg[i.next].shortestLength - gg[node].shortestLength == i.length )
+            deep(i.next);
+    }
+    gg[node].isVisited = false;
+    tempPath.pop_back();
+    return;
+}
+
+int main(void)
+{
+    cin>>n>>k>>startCity;
+    nameToNum[startCity] = 0;
+    gg[0].name = startCity;
+    gg[0].shortestLength = 0;
+    for(int i = 0; i < n - 1; i++){
+        string t;
+        int h;
+        cin>>t>>h;
+        nameToNum[t] = i + 1;
+        gg[i + 1].name = t;
+        gg[i + 1].happiness = h;
+    }
+
+    for(int i = 0; i < k; i++){
+        string a, b;
+        int len;
+        cin>>a>>b>>len;
+        int aNum = nameToNum[a], bNum = nameToNum[b];
+        road t;
+        t.length = len;
+        t.next = bNum;
+        gg[aNum].nextList.push_back(t);
+        t.next = aNum;
+        gg[bNum].nextList.push_back(t);
+    }
+    dijkstra();
+
+    /*for(int i = 0; i < n; i++){
+        cout<<gg[i].name<<" <==> "<<startCity<<":"<<gg[i].shortestLength<<endl;
+    }*/
+    romNum = nameToNum["ROM"];
+    deep(0);
+
+    partial_sort(shortestPath.begin(), shortestPath.begin() + 1, shortestPath.end(), [&](pathNode a, pathNode b){
+            if(a.totalHappiness == b.totalHappiness){
+                return a.averageHappiness > b.averageHappiness;
+            }
+            return a.totalHappiness > b.totalHappiness;
+        });
+
+    cout<<shortestPath.size()<<' '<<gg[romNum].shortestLength<<' '
+        <<shortestPath[0].totalHappiness<<' '<<shortestPath[0].averageHappiness<<endl;
+    cout<<shortestPath[0].path[0];
+    for(auto i = shortestPath[0].path.begin() + 1; i != shortestPath[0].path.end(); i++)
+        cout<<"->"<<*i;
+
+    return 0;
+}
