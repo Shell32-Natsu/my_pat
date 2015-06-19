@@ -1,0 +1,125 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 102
+
+int seq1[MMAXLEN], seq2[MMAXLEN], tmp[MMAXLEN], n, type = 1;
+
+bool isInsertion(void)
+{
+    for(int i = 0; i < n; i++)
+        if(seq1[i] != seq2[i])
+            return false;
+    return true;
+}
+
+bool mergeEnd(void)
+{
+    for(int i = 0; i < n; i++)
+        if(tmp[i] != seq2[i])
+            return false;
+    return true;
+}
+
+int main(void)
+{
+    scanf("%d", &n);
+    for(int i = 0; i < n; i++){
+        scanf("%d", seq1 + i);
+        tmp[i] = seq1[i];
+    }
+    for(int i = 0; i < n; i++)
+        scanf("%d", seq2 + i);
+
+    int insertionPos = 1;
+    for(int i = 1; i < n; i++){
+        int t = seq1[i], j;
+        for(j = 0; j <= i && seq1[j] <= t; j++);
+        if(j != i + 1){
+            for(int r = i; r > j; r--)
+                seq1[r] = seq1[r - 1];
+            seq1[j] = t;
+        }
+
+        /*for(j = 0; j < n; j++)
+            printf("%d ", seq1[j]);
+        puts("");*/
+        if(isInsertion()){
+            type = 0;
+            insertionPos = i;
+            break;
+        }
+    }
+
+    if(!type){
+        //is insertion sort
+        puts("Insertion Sort");
+        int j, i = insertionPos + 1;
+        int t = seq1[i];
+        for(j = 0; j <= i && seq1[j] <= t; j++);
+        if(j != i + 1){
+            for(int r = i; r > j; r--)
+                seq1[r] = seq1[r - 1];
+            seq1[j] = t;
+        }
+
+        for(j = 0; j < n - 1; j++)
+            printf("%d ", seq1[j]);
+        printf("%d", seq1[j]);
+    }
+    else{
+        //is merge sort
+        puts("Merge Sort");
+        int nextLen = 1, lasti = 0;
+        for(int i = 0; i < n; i++)
+            seq1[i] = tmp[i];
+
+        for(; nextLen / 2 < n; nextLen *= 2){
+            lasti = 0;
+            for(int i = 0; i < n; i++){
+                tmp[i] = seq1[i];
+                if(i % nextLen == nextLen - 1){
+                    sort(tmp + lasti, tmp + i + 1);
+                    lasti = i + 1;
+                }
+            }
+            if(lasti < n)
+                sort(tmp + lasti, tmp + n);
+
+            if(mergeEnd()){
+                nextLen *= 2;
+                lasti = 0;
+                for(int i = 0; i < n; i++){
+                    tmp[i] = seq1[i];
+                    if(i % nextLen == nextLen - 1){
+                        sort(tmp + lasti, tmp + i + 1);
+                        lasti = i + 1;
+                    }
+                }
+                if(lasti < n)
+                    sort(tmp + lasti, tmp + n);
+                break;
+            }
+            /*for(int j = 0; j < n - 1; j++)
+                printf("%d ", tmp[j]);
+            printf("%d\n", tmp[n - 1]);*/
+        }
+
+        for(int j = 0; j < n - 1; j++)
+            printf("%d ", tmp[j]);
+        printf("%d", tmp[n - 1]);
+    }
+    return 0;
+}
