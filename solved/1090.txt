@@ -1,0 +1,89 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100002
+
+int n;
+double initialPrice, percentage;
+int chain[MMAXLEN], maxLevel = 0, levels[MMAXLEN];
+
+void getLevel(int node)
+{
+    int level = 0, iNode = node;
+    while(chain[node] != -1){
+        if(levels[node] != -1){
+            levels[iNode] = levels[node] + level;
+            return;
+        }
+        level++;
+        node = chain[node];
+    }
+    levels[iNode] = level;
+}
+
+void updateLevel(int node)
+{
+    int level = levels[node];
+    node = chain[node];
+    level--;
+    if(node == -1)
+        return;
+    while(chain[node] != -1){
+        if(levels[node] != -1){
+            return;
+        }
+        level--;
+        node = chain[node];
+        levels[node] = level;
+    }
+}
+
+int main(void)
+{
+    scanf("%d%lg%lg", &n, &initialPrice, &percentage);
+    for(int i = 0; i < n; i++)
+        scanf("%d", chain + i), levels[i] = -1;
+
+    int root = 0;
+    for(; chain[root] != -1; root++);
+
+    /*vector<bool> isLeaf(n, true);
+
+    for(int i = 0; i < n; i++){
+        isLeaf[chain[i]] = false;
+    }*/
+
+    for(int i = 0; i < n; i++){
+        getLevel(i);
+        updateLevel(i);
+    }
+
+    //sort(levels, levels + n, greater<int>());
+    int c;
+    for(int i = 0; i < n; i++){
+        if(levels[i] > maxLevel){
+            maxLevel = levels[i];
+            c = 0;
+        }
+        if(levels[i] == maxLevel)
+            c++;
+    }
+
+    for(int i = 0; i < maxLevel; i++)
+        initialPrice *= (1 + percentage / 100);
+
+    printf("%.2f %d", initialPrice, c > n ? n : c);
+    return 0;
+}
