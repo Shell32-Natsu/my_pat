@@ -1,0 +1,92 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100002
+int pic[60][1286][128];
+int picChecked[60][1286][128];
+int m, n, l, t;
+vector<int> volumn;
+int tempSum = 0;
+struct threePair{
+    int i, j, k;
+    threePair(int i, int j, int k):i(i), j(j), k(k){}
+};
+
+bool checkValid(int i, int j, int k)
+{
+    if(i < 0 || i >= l || j < 0 || k < 0 || j >= m || k >= n)
+        return false;
+    if(picChecked[i][j][k] || !pic[i][j][k])
+        return false;
+    return true;
+}
+
+void deep(int i, int j, int k, int num)
+{
+    if(!checkValid(i, j, k))
+        return;
+
+    queue<threePair> q;
+    threePair tmp(i, j, k);
+    q.push(tmp);
+    while(!q.empty()){
+        threePair tt = q.front();
+        q.pop();
+        if(!checkValid(tt.i, tt.j, tt.k))
+            continue;
+        picChecked[tt.i][tt.j][tt.k] = num;
+        tempSum++;
+        if(checkValid(tt.i - 1, tt.j, tt.k))
+            q.push(threePair(tt.i - 1, tt.j, tt.k));
+        if(checkValid(tt.i + 1, tt.j, tt.k))
+            q.push(threePair(tt.i + 1, tt.j, tt.k));
+        if(checkValid(tt.i, tt.j - 1, tt.k))
+            q.push(threePair(tt.i, tt.j - 1, tt.k));
+        if(checkValid(tt.i, tt.j + 1, tt.k))
+            q.push(threePair(tt.i, tt.j + 1, tt.k));
+        if(checkValid(tt.i, tt.j, tt.k - 1))
+            q.push(threePair(tt.i, tt.j, tt.k - 1));
+        if(checkValid(tt.i, tt.j, tt.k + 1))
+            q.push(threePair(tt.i, tt.j, tt.k + 1));
+    }
+}
+
+int main(void)
+{
+    scanf("%d%d%d%d", &m, &n, &l, &t);
+    for(int i = 0; i < l; i++)
+        for(int j = 0; j < m; j++)
+            for(int k = 0; k < n; k++)
+                scanf("%d", &(pic[i][j][k]));
+
+    for(int i = 0; i < l; i++)
+        for(int j = 0; j < m; j++)
+            for(int k = 0; k < n; k++){
+                if(picChecked[i][j][k] != 0)
+                    continue;
+                int num = volumn.size() + 1;
+                tempSum = 0;
+                deep(i, j, k, num);
+                if(tempSum)
+                    volumn.push_back(tempSum);
+            }
+    int sum = 0;
+    for(auto i : volumn){
+        if(i >= t)
+            sum += i;
+    }
+    printf("%d", sum);
+    return 0;
+}

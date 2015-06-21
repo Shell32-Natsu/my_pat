@@ -1,0 +1,41 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100002
+int mod = 1000000007;
+int numOfP, numOfPA, numOfPAT;
+char str[MMAXLEN];
+
+int main(void)
+{
+    scanf("%s", str);
+    int len = strlen(str);
+    for(int i = 0; i < len; i++){
+        if(str[i] == 'P'){
+            numOfP++;
+            numOfP = numOfP % mod;
+        }
+        else if(str[i] == 'A'){
+            numOfPA += numOfP;
+            numOfPA = numOfPA % mod;
+        }
+        else{
+            numOfPAT += numOfPA;
+            numOfPAT = numOfPAT % mod;
+        }
+    }
+    printf("%d", numOfPAT);
+    return 0;
+}

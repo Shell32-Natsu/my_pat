@@ -1,0 +1,59 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 1002
+char shopStr[MMAXLEN], evaStr[MMAXLEN];
+map<char, int> shop, eva;
+
+int main(void)
+{
+    scanf("%s%s", shopStr, evaStr);
+    int shopLen = strlen(shopStr), evaLen = strlen(evaStr);
+    for(int i = 0; i < shopLen; i++){
+        if(shop.find(shopStr[i]) == shop.end()){
+            shop[shopStr[i]] = 1;
+        }
+        else
+            shop[shopStr[i]]++;
+    }
+
+    for(int i = 0; i < evaLen; i++){
+        if(eva.find(evaStr[i]) == eva.end()){
+            eva[evaStr[i]] = 1;
+        }
+        else
+            eva[evaStr[i]]++;
+    }
+
+    bool canFullfill = true;
+    int lostNum = 0;
+    for(auto i = eva.begin(); i != eva.end(); i++){
+        int shopNum = 0;
+        if(shop.find(i->first) != shop.end()){
+            shopNum = shop[i->first];
+        }
+
+        if(shopNum < i->second){
+            canFullfill = false;
+            lostNum += (i->second - shopNum);
+        }
+    }
+
+    if(canFullfill)
+        printf("Yes %d", shopLen - evaLen);
+    else
+        printf("No %d", lostNum);
+    return 0;
+}
