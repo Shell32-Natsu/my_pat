@@ -1,0 +1,63 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 10002
+
+void printFactor(long long n)
+{
+    long long i = 2;
+    for(; i * i <= n; i++){
+        if(n % i == 0)
+            printf("%d ", i);
+    }
+}
+
+int main(void)
+{
+    long long n;
+    scanf("%lld", &n);
+    int i, lasti = 1, seqStart = 0, seqEnd = 0, tempStart = 1, tempLen = 1;
+    printFactor(n);
+    for(i = 2; i * i <= n; i++){
+        long long mult = i;
+        int j;
+        if(n % i)
+            continue;
+        for(j = i + 1; n % j == 0 && n % mult == 0 && mult < n; mult *= (j++));
+        if(n % mult == 0){
+            if(j - i > seqEnd - seqStart)
+                seqStart = i, seqEnd = j;
+        }
+        else if(n % (mult / (j - 1)) == 0){
+            if(j - i - 1 > seqEnd - seqStart)
+                seqStart = i, seqEnd = j;
+        }
+        i = j - 1;
+    }
+    if(seqStart == 1)
+        seqStart++;
+    if(seqStart == 0){
+        printf("1\n%lld", n);
+        return 0;
+    }
+
+    printf("%d\n", seqEnd - seqStart);
+    for(i = seqStart; i < seqEnd - 1; i++){
+        printf("%d*", i);
+    }
+    printf("%d", seqEnd - 1);
+
+    return 0;
+}

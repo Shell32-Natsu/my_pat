@@ -1,0 +1,88 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100002
+struct node{
+    int val, next, prev = -1;
+};
+int head, n, removedHead = -1, removedTail = removedHead;
+
+node linkList[MMAXLEN];
+bool appeared[10002];
+
+void removeNode(int node)
+{
+    int next = linkList[node].next, prev = linkList[node].prev;
+    linkList[prev].next = next;
+    if(next != -1)
+        linkList[next].prev = prev;
+    int h = removedHead;
+    if(h == -1){
+        removedHead = node;
+        linkList[removedHead].next = -1;
+        removedTail = node;
+    }
+    else{
+        linkList[removedTail].next = node;
+        linkList[node].prev = removedTail;
+        linkList[node].next = -1;
+        removedTail = node;
+    }
+}
+
+int main(void)
+{
+    scanf("%d%d", &head, &n);
+    for(int i = 0; i < n; i++){
+        int addr;
+        scanf("%d", &addr);
+        scanf("%d%d", &(linkList[addr].val), &(linkList[addr].next));
+        if(linkList[addr].next != -1)
+            linkList[linkList[addr].next].prev = addr;
+    }
+
+    int node = head;
+    while(node != -1){
+        int v = abs(linkList[node].val), tmpNode = linkList[node].next;
+        if(appeared[v]){
+            removeNode(node);
+        }
+        else{
+            appeared[v] = true;
+        }
+        node = tmpNode;
+    }
+
+    node = head;
+    while(node != -1){
+        printf("%05d %d ", node, linkList[node].val);
+        if(linkList[node].next == -1)
+            printf("%d\n", -1);
+        else
+            printf("%05d\n", linkList[node].next);
+        node = linkList[node].next;
+    }
+    node = removedHead;
+    while(node != -1){
+        printf("%05d %d ", node, linkList[node].val);
+        if(linkList[node].next == -1)
+            printf("%d\n", -1);
+        else
+            printf("%05d\n", linkList[node].next);
+        node = linkList[node].next;
+    }
+
+    return 0;
+}

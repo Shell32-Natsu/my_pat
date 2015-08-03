@@ -1,0 +1,126 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100002
+
+struct gNodeList{
+    int next, length;
+};
+
+struct gNode{
+    int num;
+    int rescue, shortestLength = INT_MAX;
+    bool isShortest = false, isChecked = false;
+    vector<gNodeList> nextList;
+};
+
+gNode gg[501];
+int n, m, c1, c2, shortestLength;
+vector<vector<int> > shortestPath;
+
+bool dijkstraContinue(void)
+{
+    for(int i = 0; i < n; i++)
+        if(!gg[i].isShortest) return true;
+    return false;
+}
+
+void dijkstra(void)
+{
+    int node = c1;
+    while(dijkstraContinue()){
+        for(auto i : gg[node].nextList){
+            if(gg[node].shortestLength + i.length < gg[i.next].shortestLength)
+                gg[i.next].shortestLength = gg[node].shortestLength + i.length;
+        }
+        int shortest = INT_MAX, shortestPos = 0;
+        for(int i = 0; i < n; i++){
+            if(gg[i].isShortest)
+                continue;
+            if(gg[i].shortestLength < shortest){
+                shortest = gg[i].shortestLength;
+                shortestPos = i;
+            }
+        }
+        gg[shortestPos].isShortest = true;
+        node = shortestPos;
+    }
+}
+
+void deep(int node, vector<int> &tmpPath)
+{
+    if(node == c2){
+        tmpPath.push_back(node);
+        shortestPath.push_back(tmpPath);
+        tmpPath.pop_back();
+    }
+    if(gg[node].isChecked == true)
+        return;
+
+    tmpPath.push_back(node);
+    gg[node].isChecked = true;
+    for(auto i : gg[node].nextList){
+        if(gg[i.next].shortestLength - gg[node].shortestLength == i.length){
+            deep(i.next, tmpPath);
+        }
+    }
+    tmpPath.pop_back();
+    gg[node].isChecked = false;
+}
+
+int main(void)
+{
+    scanf("%d%d%d%d", &n, &m, &c1, &c2);
+    for(int i = 0; i < n; i++){
+        gg[i].num = i;
+        scanf("%d", &(gg[i].rescue));
+    }
+
+    for(int i = 0; i < m; i++){
+        int a, b, l;
+        scanf("%d%d%d", &a, &b, &l);
+        gNodeList tmp;
+        tmp.next = b, tmp.length = l;
+        gg[a].nextList.push_back(tmp);
+        tmp.next = a;
+        gg[b].nextList.push_back(tmp);
+    }
+
+    gg[c1].shortestLength = 0;
+    gg[c1].isShortest = true;
+
+    dijkstra();
+
+    /*for(int i = 0; i < n; i++){
+        printf("%d node's length : %d\n", i, gg[i].shortestLength);
+    }*/
+    vector<int> tmpPath;
+    shortestLength = gg[c2].shortestLength;
+    deep(c1, tmpPath);
+
+    int maxRescue = 0, tmpRescue = 0;
+    for(int i = 0; i < shortestPath.size(); i++){
+        tmpRescue = 0;
+        for(auto j : shortestPath[i]){
+            tmpRescue += gg[j].rescue;
+        }
+        if(tmpRescue > maxRescue)
+            maxRescue = tmpRescue;
+    }
+
+    printf("%d %d", shortestPath.size(), maxRescue);
+
+    return 0;
+}

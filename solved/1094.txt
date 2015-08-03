@@ -1,0 +1,73 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 102
+struct node{
+    int level, id, parent;
+    vector<int> children;
+};
+int population[MMAXLEN];
+
+node tree[MMAXLEN];
+int n, m;
+
+void BFS(void)
+{
+    int root = 1, node = root;
+    queue<int> q;
+    tree[root].level = 1;
+    for(auto i : tree[root].children)
+        q.push(i);
+    while(!q.empty()){
+        int t = q.front();
+        q.pop();
+        tree[t].level = tree[tree[t].parent].level + 1;
+        for(auto i: tree[t].children)
+            q.push(i);
+    }
+}
+
+int main(void)
+{
+    scanf("%d%d", &n, &m);
+    for(int i = 0; i < m; i++){
+        int id, t;
+        scanf("%d%d", &id, &t);
+        for(int j = 0; j < t; j++){
+            int tmp;
+            scanf("%d", &tmp);
+            tree[id].children.push_back(tmp);
+            tree[tmp].parent = id;
+        }
+    }
+
+    BFS();
+
+    for(int i = 0; i < MMAXLEN; i++){
+        if(tree[i].level)
+            population[tree[i].level]++;
+    }
+
+    int maxPos = 0, maxVal = 0;
+    for(int i = 1; i < MMAXLEN; i++){
+        if(population[i] > maxVal){
+            maxVal = population[i];
+            maxPos = i;
+        }
+    }
+
+    printf("%d %d", maxVal, maxPos);
+    return 0;
+}
