@@ -1,0 +1,61 @@
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <cstdlib>
+#include <vector>
+#include <deque>
+#include <string>
+#include <algorithm>
+#include <cmath>
+#include <queue>
+#include <climits>
+#include <map>
+#include <set>
+using namespace std;
+//#define MDEBUG true
+#define MMAXLEN 100002
+
+struct treeNode{
+    int childNum, level;
+    int children[150];
+};
+
+treeNode tree[150];
+int n, m, result[150], maxLevel = 0;
+
+void deep(int node, int level)
+{
+    if(node > n)
+        return;
+    tree[node].level = level;
+    if(level > maxLevel)
+        maxLevel = level;
+    for(int i = 0; i < tree[node].childNum; i++){
+        deep(tree[node].children[i], level + 1);
+    }
+}
+
+int main(void)
+{
+    scanf("%d%d", &n, &m);
+    int id, k;
+    for(int i = 0; i < m; i++){
+        scanf("%d%d", &id, &k);
+        tree[id].childNum = k;
+        for(int j = 0; j < k; j++){
+            scanf("%d", &(tree[id].children[j]));
+        }
+    }
+
+    deep(1, 0);
+
+    for(int i = 1; i <= n; i++){
+        if(tree[i].childNum == 0)
+            result[tree[i].level]++;
+    }
+
+    for(int i = 0; i < maxLevel; i++)
+        printf("%d ", result[i]);
+    printf("%d", result[maxLevel]);
+    return 0;
+}
